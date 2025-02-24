@@ -1,0 +1,20 @@
+<h1>Registrarse</h1>
+<%= form_with url: signup_path, method: :post, local: true do |f| %>
+  <div>
+    <%= f.label :nombre, 'Nombre' %>
+    <%= f.text_field :nombre, required: true %>
+  </div>
+  <div>
+    <%= f.label :email, 'Email' %>
+    <%= f.text_field :email, required: true %>
+  </div>
+  <div>
+    <%= f.label :password, 'Contraseña' %>
+    <%= f.password_field :password, required: true %>
+  </div>
+  <div>
+    <%= f.label :password_confirmation, 'Confirmación de Contraseña' %>
+    <%= f.password_field :password_confirmation, required: true %>
+  </div>
+  <%= f.submit "Crear Cuenta" %>
+<% end %>

@@ -1,0 +1,13 @@
+es:
+  activerecord:
+    errors:
+      messages:
+        blank: "no puede estar en blanco"
+        invalid: "no es válido"
+      models:
+        usuario:
+          attributes:
+            nombre:
+              blank: "no puede estar en blanco"
+            email:
+              blank: "no puede estar en blanco"
