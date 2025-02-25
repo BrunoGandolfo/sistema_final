@@ -346,6 +346,7 @@ DEPENDENCIES
   brakeman
   capybara
   debug
+  diff-lcs (= 1.6.0)
   factory_bot_rails
   importmap-rails
   jbuilder

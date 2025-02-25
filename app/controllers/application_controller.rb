@@ -12,4 +12,11 @@ class ApplicationController < ActionController::Base
       render json: { error: "Acceso no autorizado" }, status: :forbidden
     end
   end
+
+  # Nuevo método para autenticar al usuario y redirigirlo a login si no está autenticado
+  def authenticate_user!
+    unless current_user
+      redirect_to new_user_session_path
+    end
+  end
 end

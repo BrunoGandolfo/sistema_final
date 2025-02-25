@@ -1,11 +1,13 @@
 class PagesController < ApplicationController
-  # Si no necesitas forzar autenticación en la página de inicio, puedes omitir este callback.
-  # Si usas un método de autenticación básico, asegúrate de que esté definido en ApplicationController.
+  # Forzamos la autenticación en la página de inicio.
+  # Esto redirige automáticamente a la página de login si el usuario no está autenticado.
+  before_action :authenticate_user!
 
   def home
-    # Si ya hay un usuario autenticado, redirige al dashboard.
+    # Si el usuario ya está autenticado, lo redirige al dashboard.
     redirect_to dashboard_path if current_user
-    # Prepara un nuevo usuario para el formulario de registro.
-@user = Usuario.new
+    # Este código no se ejecutará si el usuario no está autenticado,
+    # porque 'authenticate_user!' ya redirige al login.
+    @user = Usuario.new
   end
 end

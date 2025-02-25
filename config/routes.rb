@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create', as: :login
   post '/signup', to: 'registrations#create'
   # Rutas GET para formularios de login y registro
-  get '/login', to: 'sessions#new'
+  get '/login', to: 'sessions#new', as: :new_user_session
   get '/signup', to: 'registrations#new'
 
   # Página principal
