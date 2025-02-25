@@ -1,10 +1,10 @@
 class RetiroUtilidadesController < ApplicationController
   def create
-    @retiro = RetiroUtilidad.new(retiro_utilidad_params)
-    if @retiro.save
-      render json: { message: "Retiro de Utilidad creado correctamente" }, status: :created
+    @retiro_utilidad = RetiroUtilidad.new(retiro_utilidad_params)
+    if @retiro_utilidad.save
+      render json: { message: "Retiro de utilidad creado correctamente" }, status: :created
     else
-      render json: { errors: @retiro.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @retiro_utilidad.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

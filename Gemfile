@@ -56,8 +56,11 @@ group :development do
 end
 
 group :test do
-  # Pruebas de sistema con Capybara
+  gem 'simplecov', require: false
   gem "capybara"
   gem "selenium-webdriver"
   gem "webdrivers"
+
+  gem "factory_bot_rails"
+  gem "shoulda-matchers", "~> 5.0"
 end

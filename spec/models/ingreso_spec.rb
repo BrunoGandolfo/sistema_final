@@ -1,59 +1,121 @@
 require 'rails_helper'
 
 RSpec.describe Ingreso, type: :model do
-  let!(:usuario) { 
-    Usuario.create!(
-      nombre: "Usuario Test", 
-      email: "test@ejemplo.com", 
-      rol: "colaborador", 
-      password: "password", 
-      password_confirmation: "password"
-    ) 
-  }
-  let(:cliente) { Cliente.create!(nombre: "Cliente Test") }
-  let(:tipo_cambio) { TipoCambio.create!(moneda: "USD", valor: 1.0, fecha: Time.current) }
-
-  before do
-    usuario
-    cliente
-    tipo_cambio
+  describe 'asociaciones' do
+    it { is_expected.to belong_to(:usuario) }
+    it { is_expected.to belong_to(:cliente) }
+    it { is_expected.to belong_to(:tipo_cambio) }
   end
 
-  subject {
-    Ingreso.new(
-      usuario: usuario,
-      cliente: cliente,
-      tipo_cambio: tipo_cambio,
-      monto: 200.00,
-      moneda: "USD",
-      fecha: Time.current,
-      sucursal: "Montevideo",
-      area: "Contable",
-      concepto: "Ingreso de servicios"
-    )
-  }
-
-  it "es válido con todos los atributos correctos" do
-    expect(subject).to be_valid
+  describe 'validaciones' do
+    it { is_expected.to validate_presence_of(:monto) }
+    it { is_expected.to validate_numericality_of(:monto).is_greater_than(0) }
+    it { is_expected.to validate_presence_of(:moneda) }
+    it { is_expected.to validate_inclusion_of(:moneda).in_array(['USD', 'UYU']) }
+    it { is_expected.to validate_presence_of(:fecha) }
+    it { is_expected.to validate_presence_of(:sucursal) }
+    it { is_expected.to validate_presence_of(:area) }
+    it { is_expected.to validate_presence_of(:concepto) }
   end
 
-  it "no es válido sin monto" do
-    subject.monto = nil
-    expect(subject).to_not be_valid
+  context 'con atributos válidos' do
+    let(:usuario) { create(:usuario) }
+    let(:cliente) { create(:cliente) }
+    let(:tipo_cambio) { create(:tipo_cambio) }
+
+    let(:atributos_validos) do
+      {
+        monto: 100.0,
+        moneda: 'USD',
+        fecha: Date.today,
+        sucursal: 'Montevideo',
+        area: 'Contable',
+        concepto: 'Servicio de consultoría',
+        usuario: usuario,
+        cliente: cliente,
+        tipo_cambio: tipo_cambio
+      }
+    end
+
+    it 'es válido con todos los atributos correctos' do
+      ingreso = Ingreso.new(atributos_validos)
+      expect(ingreso).to be_valid
+    end
   end
 
-  it "no es válido si el monto es menor o igual a 0" do
-    subject.monto = 0
-    expect(subject).to_not be_valid
-  end
+  context 'con atributos inválidos' do
+    let(:usuario) { create(:usuario) }
+    let(:cliente) { create(:cliente) }
+    let(:tipo_cambio) { create(:tipo_cambio) }
 
-  it "no es válido sin moneda" do
-    subject.moneda = nil
-    expect(subject).to_not be_valid
-  end
+    let(:atributos_validos) do
+      {
+        monto: 100.0,
+        moneda: 'USD',
+        fecha: Date.today,
+        sucursal: 'Montevideo',
+        area: 'Contable',
+        concepto: 'Servicio de consultoría',
+        usuario: usuario,
+        cliente: cliente,
+        tipo_cambio: tipo_cambio
+      }
+    end
 
-  it "no es válido con un valor de moneda no permitido" do
-    subject.moneda = "EUR"
-    expect(subject).to_not be_valid
+    it 'no es válido sin monto' do
+      ingreso = Ingreso.new(atributos_validos.except(:monto))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:monto]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
+
+    it 'no es válido con monto no numérico' do
+      ingreso = Ingreso.new(atributos_validos.merge(monto: 'cien'))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:monto]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
+    end
+
+    it 'no es válido con monto menor o igual a 0' do
+      ingreso = Ingreso.new(atributos_validos.merge(monto: 0))
+      expect(ingreso).not_to be_valid
+
+      ingreso = Ingreso.new(atributos_validos.merge(monto: -50))
+      expect(ingreso).not_to be_valid
+    end
+
+    it 'no es válido sin moneda' do
+      ingreso = Ingreso.new(atributos_validos.except(:moneda))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:moneda]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
+
+    it 'no es válido con moneda inválida' do
+      ingreso = Ingreso.new(atributos_validos.merge(moneda: 'EUR'))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:moneda]).to include(I18n.t('activerecord.errors.messages.inclusion'))
+    end
+
+    it 'no es válido sin fecha' do
+      ingreso = Ingreso.new(atributos_validos.except(:fecha))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:fecha]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
+
+    it 'no es válido sin sucursal' do
+      ingreso = Ingreso.new(atributos_validos.except(:sucursal))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:sucursal]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
+
+    it 'no es válido sin área' do
+      ingreso = Ingreso.new(atributos_validos.except(:area))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:area]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
+
+    it 'no es válido sin concepto' do
+      ingreso = Ingreso.new(atributos_validos.except(:concepto))
+      expect(ingreso).not_to be_valid
+      expect(ingreso.errors[:concepto]).to include(I18n.t('activerecord.errors.messages.blank'))
+    end
   end
 end

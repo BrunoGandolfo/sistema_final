@@ -4,10 +4,6 @@ es:
       messages:
         blank: "no puede estar en blanco"
         invalid: "no es válido"
-      models:
-        usuario:
-          attributes:
-            nombre:
-              blank: "no puede estar en blanco"
-            email:
-              blank: "no puede estar en blanco"
+        record_invalid: "Registro inválido: %{errors}"
+        not_a_number: "no es un número"
+        inclusion: "no está incluido en la lista"

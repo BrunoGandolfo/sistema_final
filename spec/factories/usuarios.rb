@@ -1,10 +1,8 @@
 FactoryBot.define do
   factory :usuario do
-    ingreso { "MyString" }
-    gasto { "MyString" }
-    proveedor { "MyString" }
-    tipo_cambio { "MyString" }
-    retiro_utilidad { "MyString" }
-    distribucion_utilidad { "MyString" }
+    sequence(:nombre) { |n| "Usuario de Prueba #{n}" }
+    sequence(:email) { |n| "usuario#{n}@example.com" }
+    password { "password" }
+    rol { "admin" }  # Asignamos un valor predeterminado para el rol
   end
 end
