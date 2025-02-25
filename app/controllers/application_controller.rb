@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  before_action :authenticate_user!
+
   helper_method :current_user
 
   private
@@ -9,14 +11,19 @@ class ApplicationController < ActionController::Base
 
   def require_full_access
     unless current_user && current_user.has_full_access?
-      render json: { error: "Acceso no autorizado" }, status: :forbidden
+      respond_to do |format|
+        format.json { render json: { error: "Acceso no autorizado" }, status: :forbidden }
+        format.html { redirect_to root_path, alert: "Acceso no autorizado" }
+      end
     end
   end
 
-  # Nuevo método para autenticar al usuario y redirigirlo a login si no está autenticado
   def authenticate_user!
     unless current_user
-      redirect_to new_user_session_path
+      respond_to do |format|
+        format.json { render json: { error: "Usuario no autenticado" }, status: :unauthorized }
+        format.html { redirect_to new_user_session_path, alert: "Debes iniciar sesión" }
+      end
     end
   end
 end

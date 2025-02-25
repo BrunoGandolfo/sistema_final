@@ -1,4 +1,6 @@
 class RetiroUtilidadesController < ApplicationController
+  before_action :require_full_access, only: :create
+
   def create
     @retiro_utilidad = RetiroUtilidad.new(retiro_utilidad_params)
     if @retiro_utilidad.save

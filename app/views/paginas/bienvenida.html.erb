@@ -1,0 +1,12 @@
+<h1>Bienvenido a Conexión</h1>
+<%= form_with url: login_path, method: :post, local: true do |f| %>
+  <div>
+    <%= f.label :email, 'Correo' %>
+    <%= f.text_field :email, required: true %>
+  </div>
+  <div>
+    <%= f.label :password, 'Contraseña' %>
+    <%= f.password_field :password, required: true %>
+  </div>
+  <%= f.submit "Iniciar sesión" %>
+<% end %>

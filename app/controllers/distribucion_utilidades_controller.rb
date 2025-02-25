@@ -1,4 +1,6 @@
 class DistribucionUtilidadesController < ApplicationController
+  before_action :require_full_access, only: :create
+
   def create
     @distribucion_utilidad = DistribucionUtilidad.new(distribucion_utilidad_params)
     if @distribucion_utilidad.save
@@ -12,8 +14,8 @@ class DistribucionUtilidadesController < ApplicationController
 
   def distribucion_utilidad_params
     params.require(:distribucion_utilidad).permit(
-      :fecha, 
-      :tipo_cambio, 
+      :fecha,
+      :tipo_cambio,
       :sucursal,
       :monto_uyu_agustina, :monto_usd_agustina,
       :monto_uyu_viviana,  :monto_usd_viviana,

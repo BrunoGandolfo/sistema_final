@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   # Rutas GET para formularios de login y registro
   get '/login', to: 'sessions#new', as: :new_user_session
   get '/signup', to: 'registrations#new'
-
+  get '/tablero', to: 'paginas#tablero', as: :tablero
   # Página principal
   get '/home', to: 'pages#home', as: :home
   get '/dashboard', to: 'metrics#index', as: :dashboard
