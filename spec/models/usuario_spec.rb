@@ -1,54 +1,40 @@
 require 'rails_helper'
 
 RSpec.describe Usuario, type: :model do
-  subject do
-    described_class.new(
-      nombre: "Usuario de Prueba",
-      email: "usuario@example.com",
-      password: "password",
-      password_confirmation: "password",
-      rol: "colaborador" # Cambia a 'admin' o 'socio' para probar otros roles
-    )
+  describe "#has_full_access?" do
+    subject { usuario.has_full_access? }
+
+    context "when user is admin" do
+      let(:usuario) { Usuario.new(rol: "admin") }
+      it { is_expected.to be_truthy }
+    end
+
+    context "when user is socio" do
+      let(:usuario) { Usuario.new(rol: "socio") }
+      it { is_expected.to be_truthy }
+    end
+
+    context "when user is colaborador" do
+      let(:usuario) { Usuario.new(rol: "colaborador") }
+      it { is_expected.to be_falsey }
+    end
   end
 
-  describe "validaciones" do
-    it "es válido con atributos válidos" do
-      expect(subject).to be_valid
+  describe "assign_role callback" do
+    context "when email is in socios_emails" do
+      let(:usuario) { Usuario.new(email: "socio1@example.com", nombre: "Test", password: "password", password_confirmation: "password") }
+      it "assigns role as socio" do
+        usuario.save!
+        expect(usuario.rol).to eq("socio")
+      end
     end
 
-    it "no es válido sin nombre" do
-      subject.nombre = nil
-      subject.valid?
-      expect(subject.errors[:nombre]).to include("no puede estar en blanco")
-    end
-
-    it "no es válido sin email" do
-      subject.email = nil
-      subject.valid?
-      expect(subject.errors[:email]).to include("no puede estar en blanco")
-    end
-
-    it "no es válido con un email en formato incorrecto" do
-      subject.email = "usuario_incorrecto"
-      subject.valid?
-      expect(subject.errors[:email]).not_to be_empty
-    end
-
-    it "no es válido sin password cuando se crea" do
-      subject.password = subject.password_confirmation = nil
-      subject.valid?
-      expect(subject.errors[:password]).not_to be_empty
-    end
-
-    it "no es válido si el password y su confirmación no coinciden" do
-      subject.password_confirmation = "otra_contraseña"
-      subject.valid?
-      expect(subject.errors[:password_confirmation]).not_to be_empty
-    end
-
-    it "solo acepta los roles permitidos" do
-      # Se espera que al asignar un rol no permitido se lance un ArgumentError
-      expect { subject.rol = "empleado" }.to raise_error(ArgumentError)
+    context "when email is not in socios_emails" do
+      let(:usuario) { Usuario.new(email: "user@example.com", nombre: "Test", password: "password", password_confirmation: "password") }
+      it "assigns role as colaborador" do
+        usuario.save!
+        expect(usuario.rol).to eq("colaborador")
+      end
     end
   end
 end

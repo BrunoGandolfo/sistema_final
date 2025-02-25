@@ -1,328 +1,6 @@
 {
   "RSpec": {
     "coverage": {
-      "/home/brunogandolfo/proyectos/sistema_final/app/helpers/application_helper.rb": {
-        "lines": [
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/application_controller.rb": {
-        "lines": [
-          1,
-          1,
-          null,
-          1,
-          null,
-          1,
-          1,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/distribucion_utilidades_controller.rb": {
-        "lines": [
-          1,
-          1,
-          2,
-          2,
-          1,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          2,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/gastos_controller.rb": {
-        "lines": [
-          1,
-          1,
-          2,
-          2,
-          1,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          2,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/ingresos_controller.rb": {
-        "lines": [
-          1,
-          1,
-          2,
-          2,
-          1,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          2,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/retiro_utilidades_controller.rb": {
-        "lines": [
-          1,
-          1,
-          2,
-          2,
-          1,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          2,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/cliente.rb": {
-        "lines": [
-          1,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/application_record.rb": {
-        "lines": [
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/distribucion_utilidad.rb": {
-        "lines": [
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/gasto.rb": {
-        "lines": [
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/ingreso.rb": {
-        "lines": [
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          1,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/proveedor.rb": {
-        "lines": [
-          1,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/retiro_utilidad.rb": {
-        "lines": [
-          1,
-          null,
-          null,
-          1,
-          1,
-          1,
-          null,
-          null,
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/tipo_cambio.rb": {
-        "lines": [
-          1,
-          1,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/models/usuario.rb": {
-        "lines": [
-          1,
-          null,
-          1,
-          null,
-          null,
-          1,
-          null,
-          1,
-          null,
-          null,
-          1,
-          1,
-          31,
-          null,
-          null,
-          1,
-          null,
-          null,
-          1,
-          32,
-          31,
-          null,
-          1,
-          null,
-          null,
-          null,
-          null,
-          1,
-          2,
-          2,
-          null,
-          null,
-          1,
-          null,
-          1,
-          24,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/sessions_controller.rb": {
-        "lines": [
-          1,
-          1,
-          null,
-          null,
-          null,
-          1,
-          2,
-          2,
-          1,
-          1,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          0,
-          0,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/registrations_controller.rb": {
-        "lines": [
-          1,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          1,
-          null,
-          1,
-          1,
-          null,
-          0,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          1,
-          null,
-          null
-        ]
-      },
-      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/pages_controller.rb": {
-        "lines": [
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          null,
-          1,
-          null,
-          null
-        ]
-      },
       "/home/brunogandolfo/proyectos/sistema_final/app/channels/application_cable/channel.rb": {
         "lines": [
           0,
@@ -341,13 +19,203 @@
         ],
         "branches": {}
       },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/application_controller.rb": {
+        "lines": [
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/distribucion_utilidades_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/gastos_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/ingresos_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
       "/home/brunogandolfo/proyectos/sistema_final/app/controllers/metrics_controller.rb": {
         "lines": [
           0,
           0,
           null,
           0,
+          null,
           0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/pages_controller.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          null,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/registrations_controller.rb": {
+        "lines": [
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/retiro_utilidades_controller.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/controllers/sessions_controller.rb": {
+        "lines": [
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/helpers/application_helper.rb": {
+        "lines": [
           0,
           0
         ],
@@ -373,8 +241,180 @@
           0
         ],
         "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/application_record.rb": {
+        "lines": [
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/cliente.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/distribucion_utilidad.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/gasto.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/ingreso.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/proveedor.rb": {
+        "lines": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/retiro_utilidad.rb": {
+        "lines": [
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/tipo_cambio.rb": {
+        "lines": [
+          0,
+          0,
+          0
+        ],
+        "branches": {}
+      },
+      "/home/brunogandolfo/proyectos/sistema_final/app/models/usuario.rb": {
+        "lines": [
+          0,
+          null,
+          0,
+          null,
+          null,
+          0,
+          null,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          0,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "branches": {}
       }
     },
-    "timestamp": 1740441970
+    "timestamp": 1740500997
   }
 }

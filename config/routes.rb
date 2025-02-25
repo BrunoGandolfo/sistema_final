@@ -21,5 +21,6 @@ Rails.application.routes.draw do
 
   # Página principal
   get '/home', to: 'pages#home', as: :home
+  get '/dashboard', to: 'metrics#index', as: :dashboard
   root "pages#home"
 end
