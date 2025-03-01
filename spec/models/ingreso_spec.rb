@@ -18,6 +18,43 @@ RSpec.describe Ingreso, type: :model do
     it { is_expected.to validate_presence_of(:concepto) }
   end
 
+  describe 'métodos de clase' do
+    describe '.crear_con_usuario' do
+      let(:usuario) { create(:usuario) }
+      let(:cliente) { create(:cliente) }
+      let(:tipo_cambio) { create(:tipo_cambio) }
+      
+      let(:parametros_validos) do
+        {
+          monto: 100.0,
+          moneda: 'USD',
+          fecha: Date.today,
+          sucursal: 'Montevideo',
+          area: 'Contable',
+          concepto: 'Servicio de consultoría',
+          cliente_id: cliente.id,
+          tipo_cambio_id: tipo_cambio.id
+        }
+      end
+      
+      it 'crea un ingreso y le asigna el usuario' do
+        ingreso = Ingreso.crear_con_usuario(parametros_validos, usuario)
+        
+        expect(ingreso).to be_persisted
+        expect(ingreso.usuario).to eq(usuario)
+        expect(ingreso.monto).to eq(100.0)
+      end
+      
+      it 'devuelve el ingreso sin persistir si hay errores' do
+        parametros_invalidos = parametros_validos.except(:monto)
+        ingreso = Ingreso.crear_con_usuario(parametros_invalidos, usuario)
+        
+        expect(ingreso).not_to be_persisted
+        expect(ingreso.errors[:monto]).to be_present
+      end
+    end
+  end
+
   context 'con atributos válidos' do
     let(:usuario) { create(:usuario) }
     let(:cliente) { create(:cliente) }
