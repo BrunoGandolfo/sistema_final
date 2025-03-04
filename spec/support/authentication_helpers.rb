@@ -1,14 +1,27 @@
 module AuthenticationHelpers
   def sign_in(usuario)
-    # Establecer la sesión directamente para pruebas que no requieren interacción con la UI
-    page.driver.browser.rack_mock_session.cookie_jar['rack.session'] = { user_id: usuario.id }
+    if page.driver.browser.respond_to?(:rack_mock_session)
+      # Para drivers que no interactúan con la UI (rack_test)
+      page.driver.browser.rack_mock_session.cookie_jar['rack.session'] = {
+        user_id: usuario.id
+      }
+    else
+      # Para drivers que interactúan con la UI (Selenium)
+      visit new_user_session_path
+      fill_in "email", with: usuario.email
+      fill_in "password", with: usuario.password
+      click_button "Entrar"
+      expect(page).to have_content(usuario.nombre)
+    end
   end
-  
-  def login_via_form(usuario)
-    visit new_user_session_path
-    fill_in "Email", with: usuario.email
-    fill_in "Password", with: "password"
-    click_button "Entrar"
+
+  def sign_out
+    if page.driver.browser.respond_to?(:rack_mock_session)
+      page.driver.browser.rack_mock_session.cookie_jar['rack.session'] = {}
+    else
+      visit root_path
+      click_link "Cerrar Sesión"
+    end
   end
 end
 

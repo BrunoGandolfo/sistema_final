@@ -1,16 +1,29 @@
+# app/controllers/gastos_controller.rb
+
 class GastosController < ApplicationController
+  before_action :authenticate_user!
+
   def create
-    @gasto = Gasto.new(gasto_params)
-    if @gasto.save
-      render json: { message: "Gasto creado correctamente" }, status: :created
+    @gasto = Gasto.crear_con_usuario(gasto_params, current_user)
+
+    if @gasto.persisted?
+      if api_request?
+        json_success('Gasto creado correctamente', @gasto, :created)
+      else
+        redirect_to dashboard_path, notice: 'Gasto registrado con éxito.'
+      end
     else
-      render json: { errors: @gasto.errors.full_messages }, status: :unprocessable_entity
+      if api_request?
+        json_error('Error al registrar gasto', @gasto.errors.full_messages)
+      else
+        redirect_to dashboard_path, alert: "Error al registrar gasto: #{@gasto.errors.full_messages.join(', ')}"
+      end
     end
   end
 
   private
 
   def gasto_params
-    params.require(:gasto).permit(:usuario_id, :proveedor_id, :tipo_cambio_id, :monto, :moneda, :fecha, :sucursal, :area, :concepto)
+    params.require(:gasto).permit(:fecha, :concepto, :monto, :moneda, :area, :proveedor_id, :sucursal, :tipo_cambio_id)
   end
 end

@@ -1,3 +1,4 @@
+# spec/controllers/retiro_utilidades_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe RetiroUtilidadesController, type: :controller do
@@ -52,6 +53,7 @@ RSpec.describe RetiroUtilidadesController, type: :controller do
           }.to change(RetiroUtilidad, :count).by(1)
           expect(response).to have_http_status(:created)
           json_response = JSON.parse(response.body)
+          expect(json_response["status"]).to eq("success")
           expect(json_response["message"]).to eq("Retiro de utilidad creado correctamente")
         end
       end
@@ -63,6 +65,7 @@ RSpec.describe RetiroUtilidadesController, type: :controller do
           }.not_to change(RetiroUtilidad, :count)
           expect(response).to have_http_status(:unprocessable_entity)
           json_response = JSON.parse(response.body)
+          expect(json_response["status"]).to eq("error")
           expect(json_response).to have_key("errors")
         end
       end
@@ -73,11 +76,12 @@ RSpec.describe RetiroUtilidadesController, type: :controller do
         allow(controller).to receive(:current_user).and_return(unauthorized_user)
       end
 
-      it "retorna status forbidden" do
+      it "retorna status forbidden con error de autorización" do
         post :create, params: { retiro_utilidad: valid_attributes }, as: :json
         expect(response).to have_http_status(:forbidden)
         json_response = JSON.parse(response.body)
-        expect(json_response["error"]).to eq("Acceso no autorizado")
+        expect(json_response["status"]).to eq("error")
+        expect(json_response["message"]).to eq("Acceso no autorizado")
       end
     end
 
@@ -90,7 +94,8 @@ RSpec.describe RetiroUtilidadesController, type: :controller do
         post :create, params: { retiro_utilidad: valid_attributes }, as: :json
         expect(response).to have_http_status(:unauthorized)
         json_response = JSON.parse(response.body)
-        expect(json_response["error"]).to eq("Usuario no autenticado")
+        expect(json_response["status"]).to eq("error")
+        expect(json_response["message"]).to eq("Usuario no autenticado")
       end
     end
   end

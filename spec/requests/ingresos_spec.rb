@@ -1,3 +1,5 @@
+# spec/requests/ingresos_spec.rb
+
 require 'rails_helper'
 
 RSpec.describe "Ingresos API", type: :request do
@@ -44,7 +46,6 @@ RSpec.describe "Ingresos API", type: :request do
   describe "POST /ingresos" do
     context "cuando el usuario está autenticado" do
       before do
-        # Simulamos que el usuario está autenticado forzando current_user en el test.
         allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
       end
 
@@ -69,7 +70,6 @@ RSpec.describe "Ingresos API", type: :request do
 
     context "cuando el usuario no está autenticado" do
       before do
-        # Simulamos que no hay usuario autenticado
         allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(nil)
       end
 

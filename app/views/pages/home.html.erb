@@ -1,7 +1,24 @@
-<!-- app/views/pages/home.html.erb -->
-<nav>
-  <%= link_to "Iniciar Sesión", login_path %>
-  <%= link_to "Registrarse", signup_path %>
-</nav>
+<div class="home-container">
+  <h1>Bienvenido al Sistema de Gestión Financiera</h1>
+  <p>Sistema integral para el registro y análisis de operaciones financieras de Conexión Consultora.</p>
 
-<h2>Bienvenidos al Sistema</h2>
+  <div class="card">
+    <h2>Características principales</h2>
+    <ul>
+      <li>Dashboard con métricas financieras</li>
+      <li>Registro de ingresos y gastos</li>
+      <li>Gestión de retiros y distribución de utilidades</li>
+      <li>Consultas avanzadas con IA</li>
+      <li>Generación de reportes</li>
+    </ul>
+  </div>
+
+  <div class="actions">
+    <% if current_user %>
+      <%= link_to 'Ir al Dashboard', dashboard_path, class: 'button', id: 'goto-dashboard', data: { testid: 'goto-dashboard' } %>
+    <% else %>
+      <%= link_to 'Iniciar Sesión', new_user_session_path, class: 'button', id: 'goto-login', data: { testid: 'goto-login' } %>
+      <%= link_to 'Registrarse', signup_path, class: 'button', id: 'goto-signup', data: { testid: 'goto-signup' } %>
+    <% end %>
+  </div>
+</div>

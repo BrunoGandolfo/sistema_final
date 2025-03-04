@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_18_123858) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_28_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,7 +22,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_123858) do
 
   create_table "distribuciones_utilidades", force: :cascade do |t|
     t.datetime "fecha", null: false
-    t.decimal "tipo_cambio", precision: 10, scale: 4, null: false
     t.string "sucursal", limit: 20, null: false
     t.decimal "monto_uyu_agustina", precision: 15, scale: 2
     t.decimal "monto_usd_agustina", precision: 15, scale: 2
@@ -36,6 +35,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_123858) do
     t.decimal "monto_usd_bruno", precision: 15, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "usuario_id", null: false
+    t.bigint "tipo_cambio_id", null: false
+    t.index ["tipo_cambio_id"], name: "index_distribuciones_utilidades_on_tipo_cambio_id"
+    t.index ["usuario_id"], name: "index_distribuciones_utilidades_on_usuario_id"
   end
 
   create_table "gastos", force: :cascade do |t|
@@ -90,13 +93,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_123858) do
 
   create_table "retiros_utilidades", force: :cascade do |t|
     t.datetime "fecha", null: false
-    t.decimal "tipo_cambio", precision: 10, scale: 4, null: false
     t.decimal "monto_uyu", precision: 15, scale: 2
     t.decimal "monto_usd", precision: 15, scale: 2
     t.string "sucursal", limit: 20, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "usuario_id", null: false
+    t.bigint "tipo_cambio_id", null: false
     t.index ["fecha", "sucursal"], name: "idx_retiros_fecha_sucursal"
+    t.index ["tipo_cambio_id"], name: "index_retiros_utilidades_on_tipo_cambio_id"
+    t.index ["usuario_id"], name: "index_retiros_utilidades_on_usuario_id"
   end
 
   create_table "tipos_cambio", force: :cascade do |t|
@@ -118,10 +124,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_123858) do
     t.string "password_digest"
   end
 
+  add_foreign_key "distribuciones_utilidades", "tipos_cambio"
+  add_foreign_key "distribuciones_utilidades", "usuarios"
   add_foreign_key "gastos", "proveedores"
   add_foreign_key "gastos", "tipos_cambio"
   add_foreign_key "gastos", "usuarios"
   add_foreign_key "ingresos", "clientes"
   add_foreign_key "ingresos", "tipos_cambio"
   add_foreign_key "ingresos", "usuarios"
+  add_foreign_key "retiros_utilidades", "tipos_cambio"
+  add_foreign_key "retiros_utilidades", "usuarios"
 end

@@ -1,0 +1,367 @@
+<h1>Dashboard Financiero</h1>
+<div class="filters" id="dashboard-filters" data-testid="dashboard-filters">
+  <div class="form-group">
+    <label for="period-filter">Período:</label>
+    <select id="period-filter" data-testid="period-filter">
+      <option value="current_month">Mes actual</option>
+      <option value="previous_month">Mes anterior</option>
+      <option value="ytd">Año hasta la fecha</option>
+      <option value="custom">Personalizado</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="currency-filter">Moneda:</label>
+    <select id="currency-filter" data-testid="currency-filter">
+      <option value="UYU">Pesos (UYU)</option>
+      <option value="USD">Dólares (USD)</option>
+    </select>
+  </div>
+  <% unless current_user.rol == "colaborador" %>
+    <div class="form-group">
+      <label for="location-filter">Sucursal:</label>
+      <select id="location-filter" data-testid="location-filter">
+        <option value="all">Todas</option>
+        <option value="Montevideo">Montevideo</option>
+        <option value="Mercedes">Mercedes</option>
+      </select>
+    </div>
+  <% end %>
+</div>
+<div class="metrics-grid">
+  <div class="metric-card" id="saldo-neto" data-testid="saldo-neto">
+    <h3>Saldo Neto</h3>
+    <div class="metric-value">UYU 1,234,567</div>
+  </div>
+  <div class="metric-card" id="facturacion-total" data-testid="facturacion-total">
+    <h3>Facturación Total</h3>
+    <div class="metric-value">UYU 2,345,678</div>
+  </div>
+  <div class="metric-card" id="area-mayor-facturacion" data-testid="area-mayor-facturacion">
+    <h3>Área Mayor Facturación</h3>
+    <div class="metric-value">Contable (45%)</div>
+  </div>
+  <div class="metric-card" id="rentabilidad" data-testid="rentabilidad">
+    <h3>Rentabilidad Neta</h3>
+    <div class="metric-value">65.4%</div>
+  </div>
+  <div class="metric-card" id="top-clientes" data-testid="top-clientes">
+    <h3>Top 3 Clientes</h3>
+    <ol>
+      <li>Cliente A (UYU 765,432)</li>
+      <li>Cliente B (UYU 543,210)</li>
+      <li>Cliente C (UYU 432,109)</li>
+    </ol>
+  </div>
+</div>
+<div class="operations-grid">
+  <h2>Operaciones</h2>
+  <div class="operation-buttons">
+    <%= button_tag 'Registrar Ingreso', type: 'button', class: 'button', id: 'new-ingreso-button', data: { toggle: 'modal', target: '#ingreso-modal', testid: 'new-ingreso-button' } %>
+    <%= button_tag 'Registrar Gasto', type: 'button', class: 'button', id: 'new-gasto-button', data: { toggle: 'modal', target: '#gasto-modal', testid: 'new-gasto-button' } %>
+    <% if current_user.rol == "socio" %>
+      <%= button_tag 'Retiro de Utilidades', type: 'button', class: 'button', id: 'new-retiro-button', data: { toggle: 'modal', target: '#retiro-modal', testid: 'new-retiro-button' } %>
+      <%= button_tag 'Distribución de Utilidades', type: 'button', class: 'button', id: 'new-distribucion-button', data: { toggle: 'modal', target: '#distribucion-modal', testid: 'new-distribucion-button' } %>
+    <% else %>
+      <button disabled class="button disabled">Retiro de Utilidades</button>
+      <button disabled class="button disabled">Distribución de Utilidades</button>
+    <% end %>
+  </div>
+</div>
+
+<!-- El resto del archivo permanece igual -->
+<!-- Modal para Ingreso -->
+<div id="ingreso-modal" class="modal" style="display: none;" data-testid="ingreso-modal">
+  <div class="modal-content">
+    <span class="close" data-testid="ingreso-modal-close">&times;</span>
+    <h2>Registrar Ingreso</h2>
+    <%= form_with url: ingresos_path, method: :post, id: 'ingreso-form', local: true, data: { testid: 'ingreso-form' } do |f| %>
+      <div class="form-group">
+        <%= f.label :fecha, 'Fecha' %>
+        <%= f.date_field :fecha, id: 'ingreso-fecha', value: Date.today, required: true, data: { testid: 'ingreso-fecha' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :concepto, 'Concepto' %>
+        <%= f.text_field :concepto, id: 'ingreso-concepto', required: true, data: { testid: 'ingreso-concepto' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :monto, 'Monto' %>
+        <%= f.number_field :monto, id: 'ingreso-monto', step: '0.01', required: true, data: { testid: 'ingreso-monto' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :moneda, 'Moneda' %>
+        <%= f.select :moneda, ['UYU', 'USD'], {}, { id: 'ingreso-moneda', required: true, data: { testid: 'ingreso-moneda' } } %>
+      </div>       <div class="form-group">
+        <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
+        <%= f.collection_select :tipo_cambio_id,
+                                TipoCambio.order(fecha: :desc),
+                                :id,
+                                :valor,
+                                { prompt: "Seleccione tipo de cambio" },
+                                { id: 'ingreso-tipo-cambio', required: true, data: { testid: 'ingreso-tipo-cambio' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :area, 'Área' %>
+        <%= f.select :area,
+                     ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Otro'],
+                     {},
+                     { id: 'ingreso-area', required: true, data: { testid: 'ingreso-area' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :cliente_id, 'Cliente' %>
+        <%= f.collection_select :cliente_id,
+                                Cliente.all,
+                                :id,
+                                :nombre,
+                                { prompt: "Seleccione cliente" },
+                                { id: 'ingreso-cliente', required: true, data: { testid: 'ingreso-cliente' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :sucursal, 'Sucursal' %>
+        <%= f.select :sucursal, ['Montevideo', 'Mercedes'], {}, { id: 'ingreso-sucursal', required: true, data: { testid: 'ingreso-sucursal' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+        <%= f.submit 'Guardar Ingreso', id: 'ingreso-submit', data: { testid: 'ingreso-submit' } %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<!-- Modal para Gasto -->
+<div id="gasto-modal" class="modal" style="display: none;" data-testid="gasto-modal">
+  <div class="modal-content">
+    <span class="close" data-testid="gasto-modal-close">&times;</span>
+    <h2>Registrar Gasto</h2>
+    <%= form_with url: gastos_path, method: :post, id: 'gasto-form', local: true, data: { testid: 'gasto-form' } do |f| %>
+      <div class="form-group">      <%= f.label :fecha, 'Fecha' %>
+        <%= f.date_field :fecha, id: 'gasto-fecha', value: Date.today, required: true, data: { testid: 'gasto-fecha' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :concepto, 'Concepto' %>
+        <%= f.text_field :concepto, id: 'gasto-concepto', required: true, data: { testid: 'gasto-concepto' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :monto, 'Monto' %>
+        <%= f.number_field :monto, id: 'gasto-monto', step: '0.01', required: true, data: { testid: 'gasto-monto' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :moneda, 'Moneda' %>
+        <%= f.select :moneda, ['UYU', 'USD'], {}, { id: 'gasto-moneda', required: true, data: { testid: 'gasto-moneda' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
+        <%= f.collection_select :tipo_cambio_id,
+                                TipoCambio.order(fecha: :desc),
+                                :id,
+                                :valor,
+                                { prompt: "Seleccione tipo de cambio" },
+                                { id: 'gasto-tipo-cambio', required: true, data: { testid: 'gasto-tipo-cambio' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :area, 'Área' %>
+        <%= f.select :area,
+                     ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Gastos Generales'],
+                     {},
+                     { id: 'gasto-area', required: true, data: { testid: 'gasto-area' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :proveedor_id, 'Proveedor' %>
+        <%= f.collection_select :proveedor_id,
+                                Proveedor.all,
+                                :id,
+                                :nombre,
+                                { prompt: "Seleccione proveedor" },
+                                { id: 'gasto-proveedor', required: true, data: { testid: 'gasto-proveedor' } } %>
+      </div>                <div class="form-group">
+        <%= f.label :sucursal, 'Sucursal' %>
+        <%= f.select :sucursal, ['Montevideo', 'Mercedes'], {}, { id: 'gasto-sucursal', required: true, data: { testid: 'gasto-sucursal' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+        <%= f.submit 'Guardar Gasto', id: 'gasto-submit', data: { testid: 'gasto-submit' } %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<!-- Modal para Retiro de Utilidades -->
+<div id="retiro-modal" class="modal" style="display: none;" data-testid="retiro-modal">
+  <div class="modal-content">
+    <span class="close" data-testid="retiro-modal-close">&times;</span>
+    <h2>Registrar Retiro de Utilidades</h2>
+    <%= form_with url: retiro_utilidades_path, method: :post, id: 'retiro-form', local: true, data: { testid: 'retiro-form' } do |f| %>
+      <div class="form-group">
+        <%= f.label :fecha, 'Fecha' %>
+        <%= f.date_field :fecha, id: 'retiro-fecha', value: Date.today, required: true, data: { testid: 'retiro-fecha' } %>
+      </div>
+      <!-- Este campo debe ser modificado de tipo_cambio a tipo_cambio_id -->
+      <div class="form-group">
+        <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
+        <%= f.collection_select :tipo_cambio_id,
+                                TipoCambio.order(fecha: :desc),
+                                :id,
+                                :valor,
+                                { prompt: "Seleccione tipo de cambio" },
+                                { id: 'retiro-tipo-cambio', required: true, data: { testid: 'retiro-tipo-cambio' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :monto_dolares, 'Monto en Dólares (USD)' %>
+        <%= f.number_field :monto_dolares, id: 'retiro-monto-usd', step: '0.01', data: { testid: 'retiro-monto-dolares' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :monto_pesos, 'Monto en Pesos (UYU)' %>
+        <%= f.number_field :monto_pesos, id: 'retiro-monto-uyu', step: '0.01', data: { testid: 'retiro-monto-pesos' } %>
+      </div>
+      <div class="form-group">
+        <%= f.label :localidad, 'Sucursal' %>
+        <%= f.select :localidad, [['Montevideo', 'montevideo'], ['Mercedes', 'mercedes']], {}, { id: 'retiro-sucursal', required: true, data: { testid: 'retiro-localidad' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+        <%= f.submit 'Guardar Retiro', id: 'retiro-submit', data: { testid: 'retiro-submit' } %>
+      </div>
+    <% end %>        </div>
+</div>
+<!-- Modal para Distribución de Utilidades -->
+<div id="distribucion-modal" class="modal" style="display: none;" data-testid="distribucion-modal">
+  <div class="modal-content">
+    <span class="close" data-testid="distribucion-modal-close">&times;</span>
+    <h2>Registrar Distribución de Utilidades</h2>
+    <%= form_with url: distribucion_utilidades_path, method: :post, id: 'distribucion-form', local: true, data: { testid: 'distribucion-form' } do |f| %>
+      <div class="form-group">
+        <%= f.label :fecha, 'Fecha' %>
+        <%= f.date_field :fecha, id: 'distribucion-fecha', value: Date.today, required: true, data: { testid: 'distribucion-fecha' } %>
+      </div>
+      <!-- Este campo debe ser modificado de tipo_cambio a tipo_cambio_id -->
+      <div class="form-group">
+        <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
+        <%= f.collection_select :tipo_cambio_id,
+                                TipoCambio.order(fecha: :desc),
+                                :id,
+                                :valor,
+                                { prompt: "Seleccione tipo de cambio" },
+                                { id: 'distribucion-tipo-cambio', required: true, data: { testid: 'distribucion-tipo-cambio' } } %>
+      </div>
+      <fieldset>
+        <legend>Socio 1 - Agustina</legend>
+        <div class="form-group">
+          <%= f.label :monto_pesos_agustina, 'Monto en Pesos (UYU)' %>
+          <%= f.number_field :monto_pesos_agustina, id: 'socio1-monto-uyu', step: '0.01', data: { testid: 'monto-pesos-agustina' } %>
+        </div>
+        <div class="form-group">
+          <%= f.label :monto_dolares_agustina, 'Monto en Dólares (USD)' %>
+          <%= f.number_field :monto_dolares_agustina, id: 'socio1-monto-usd', step: '0.01', data: { testid: 'monto-dolares-agustina' } %>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Socio 2 - Viviana</legend>
+        <div class="form-group">
+          <%= f.label :monto_pesos_viviana, 'Monto en Pesos (UYU)' %>
+          <%= f.number_field :monto_pesos_viviana, id: 'socio2-monto-uyu', step: '0.01', data: { testid: 'monto-pesos-viviana' } %>
+        </div>
+        <div class="form-group">
+          <%= f.label :monto_dolares_viviana, 'Monto en Dólares (USD)' %>
+          <%= f.number_field :monto_dolares_viviana, id: 'socio2-monto-usd', step: '0.01', data: { testid: 'monto-dolares-viviana' } %>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Socio 3 - Gonzalo</legend>
+        <div class="form-group">
+          <%= f.label :monto_pesos_gonzalo, 'Monto en Pesos (UYU)' %>
+          <%= f.number_field :monto_pesos_gonzalo, id: 'socio3-monto-uyu', step: '0.01', data: { testid: 'monto-pesos-gonzalo' } %>      </div>
+        <div class="form-group">
+          <%= f.label :monto_dolares_gonzalo, 'Monto en Dólares (USD)' %>
+          <%= f.number_field :monto_dolares_gonzalo, id: 'socio3-monto-usd', step: '0.01', data: { testid: 'monto-dolares-gonzalo' } %>
+        </div>
+      </fieldset>
+      <div class="form-group">
+        <%= f.label :localidad, 'Sucursal' %>
+        <%= f.select :localidad, [['Montevideo', 'montevideo'], ['Mercedes', 'mercedes']], {}, { id: 'distribucion-sucursal', required: true, data: { testid: 'distribucion-localidad' } } %>
+      </div>
+      <div class="form-group">
+        <%= f.hidden_field :usuario_id, value: current_user.id %>
+        <%= f.submit 'Guardar Distribución', id: 'distribucion-submit', data: { testid: 'distribucion-submit' } %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<script>
+  // Modal functionality
+  document.querySelectorAll('.button[data-toggle="modal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      document.querySelector(targetId).style.display = 'block';
+    });
+  });
+  document.querySelectorAll('.close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', function() {
+      this.closest('.modal').style.display = 'none';
+    });
+  });
+  // Close modal when clicking outside
+  window.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+      event.target.style.display = 'none';
+    }
+  });
+  // Envío de formularios con fetch para evitar recarga
+  // (Simples notificaciones de éxito/fracaso en forma de alert para ejemplo)
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch(this.action, {
+        method: this.method.toUpperCase(),
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content         },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message);
+          // Cerrar el modal
+          document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        } else if (data.errors) {
+          alert(data.errors.join(', '));
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    });
+  });
+</script>
+<style>
+  /* Estilos para modal */
+  .modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 70%;
+    max-width: 600px;
+    border-radius: 5px;
+    position: relative;
+  }
+  .close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .metrics-grid, .operations-grid {
+    margin-bottom: 30px;
+  }   .metric-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+  }
+</style>

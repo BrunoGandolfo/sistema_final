@@ -7,3 +7,10 @@ es:
         record_invalid: "Registro inválido: %{errors}"
         not_a_number: "no es un número"
         inclusion: "no está incluido en la lista"
+        confirmation: "no coincide con la confirmación"
+    attributes:
+      usuario:
+        password: "Contraseña"
+        password_confirmation: "Confirmación de contraseña"
+        email: "Correo electrónico"
+        nombre: "Nombre"

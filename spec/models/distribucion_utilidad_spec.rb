@@ -3,12 +3,11 @@ require 'rails_helper'
 RSpec.describe DistribucionUtilidad, type: :model do
   describe 'validaciones' do
     it { is_expected.to validate_presence_of(:fecha) }
-    it { is_expected.to validate_presence_of(:tipo_cambio) }
-    it { is_expected.to validate_numericality_of(:tipo_cambio).is_greater_than(0) }
-    it { is_expected.to validate_presence_of(:sucursal) }
-
-    it { is_expected.to validate_numericality_of(:monto_uyu_agustina).allow_nil }
-    it { is_expected.to validate_numericality_of(:monto_usd_agustina).allow_nil }
+    it { is_expected.to belong_to(:tipo_cambio) }
+    it { is_expected.to belong_to(:usuario).optional(true) }  # Ajustado para reflejar optional:true
+    it { is_expected.to validate_presence_of(:sucursal) }  # Cambiado de localidad a sucursal
+    it { is_expected.to validate_numericality_of(:monto_uyu_agustina).allow_nil }  # Cambiado de monto_pesos
+    it { is_expected.to validate_numericality_of(:monto_usd_agustina).allow_nil }  # Cambiado de monto_dolares
     it { is_expected.to validate_numericality_of(:monto_uyu_viviana).allow_nil }
     it { is_expected.to validate_numericality_of(:monto_usd_viviana).allow_nil }
     it { is_expected.to validate_numericality_of(:monto_uyu_gonzalo).allow_nil }
@@ -20,13 +19,17 @@ RSpec.describe DistribucionUtilidad, type: :model do
   end
 
   context 'con atributos válidos' do
+    let(:usuario) { FactoryBot.create(:usuario) }
+    let(:tipo_cambio) { FactoryBot.create(:tipo_cambio) }
+
     let(:atributos_validos) do
       {
         fecha: Date.today,
-        tipo_cambio: 1.5,
-        sucursal: 'Montevideo',
-        monto_uyu_agustina: 1000.0,
-        monto_usd_agustina: 50.0,
+        tipo_cambio: tipo_cambio,
+        usuario: usuario,
+        sucursal: "montevideo",  # Cambiado de localidad a sucursal
+        monto_uyu_agustina: 1000.0,  # Cambiado de monto_pesos_agustina
+        monto_usd_agustina: 50.0,    # Cambiado de monto_dolares_agustina
         monto_uyu_viviana: 900.0,
         monto_usd_viviana: 45.0,
         monto_uyu_gonzalo: 1100.0,
@@ -56,13 +59,17 @@ RSpec.describe DistribucionUtilidad, type: :model do
   end
 
   context 'con atributos inválidos' do
+    let(:usuario) { FactoryBot.create(:usuario) }
+    let(:tipo_cambio) { FactoryBot.create(:tipo_cambio) }
+
     let(:atributos_validos) do
       {
         fecha: Date.today,
-        tipo_cambio: 1.5,
-        sucursal: 'Montevideo',
-        monto_uyu_agustina: 1000.0,
-        monto_usd_agustina: 50.0,
+        tipo_cambio: tipo_cambio,
+        usuario: usuario,
+        sucursal: "montevideo",  # Cambiado de localidad a sucursal
+        monto_uyu_agustina: 1000.0,  # Cambiado de monto_pesos_agustina
+        monto_usd_agustina: 50.0,    # Cambiado de monto_dolares_agustina
         monto_uyu_viviana: 900.0,
         monto_usd_viviana: 45.0,
         monto_uyu_gonzalo: 1100.0,
@@ -83,78 +90,70 @@ RSpec.describe DistribucionUtilidad, type: :model do
     it 'no es válido sin tipo_cambio' do
       distribucion = DistribucionUtilidad.new(atributos_validos.except(:tipo_cambio))
       expect(distribucion).not_to be_valid
-      expect(distribucion.errors[:tipo_cambio]).to include(I18n.t('activerecord.errors.messages.blank'))
+      expect(distribucion.errors[:tipo_cambio]).to be_present
     end
 
-    it 'no es válido con tipo_cambio menor o igual a 0' do
-      distribucion = DistribucionUtilidad.new(atributos_validos.merge(tipo_cambio: 0))
-      expect(distribucion).not_to be_valid
-
-      distribucion = DistribucionUtilidad.new(atributos_validos.merge(tipo_cambio: -1))
-      expect(distribucion).not_to be_valid
-    end
-
-    it 'no es válido sin sucursal' do
+    it 'no es válido sin sucursal' do  # Cambiado de localidad a sucursal
       distribucion = DistribucionUtilidad.new(atributos_validos.except(:sucursal))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:sucursal]).to include(I18n.t('activerecord.errors.messages.blank'))
     end
 
-    it 'no es válido si monto_uyu_agustina no es numérico' do
+    it 'no es válido si monto_uyu_agustina no es numérico' do  # Cambiado de monto_pesos_agustina
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_uyu_agustina: "mil"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_uyu_agustina]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_usd_agustina no es numérico' do
+    it 'no es válido si monto_usd_agustina no es numérico' do  # Cambiado de monto_dolares_agustina
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_usd_agustina: "cincuenta"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_usd_agustina]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_uyu_viviana no es numérico' do
+    it 'no es válido si monto_uyu_viviana no es numérico' do  # Cambiado de monto_pesos_viviana
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_uyu_viviana: "novecientos"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_uyu_viviana]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_usd_viviana no es numérico' do
+    it 'no es válido si monto_usd_viviana no es numérico' do  # Cambiado de monto_dolares_viviana
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_usd_viviana: "cuarenta y cinco"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_usd_viviana]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_uyu_gonzalo no es numérico' do
+    it 'no es válido si monto_uyu_gonzalo no es numérico' do  # Cambiado de monto_pesos_gonzalo
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_uyu_gonzalo: "mil ciento"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_uyu_gonzalo]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_usd_gonzalo no es numérico' do
+    it 'no es válido si monto_usd_gonzalo no es numérico' do  # Cambiado de monto_dolares_gonzalo
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_usd_gonzalo: "cincuenta y cinco"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_usd_gonzalo]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_uyu_pancho no es numérico' do
+    it 'no es válido si monto_uyu_pancho no es numérico' do  # Cambiado de monto_pesos_pancho
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_uyu_pancho: "mil doscientos"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_uyu_pancho]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_usd_pancho no es numérico' do
+    it 'no es válido si monto_usd_pancho no es numérico' do  # Cambiado de monto_dolares_pancho
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_usd_pancho: "sesenta"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_usd_pancho]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_uyu_bruno no es numérico' do
+    it 'no es válido si monto_uyu_bruno no es numérico' do  # Cambiado de monto_pesos_bruno
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_uyu_bruno: "mil trescientos"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_uyu_bruno]).to include(I18n.t('activerecord.errors.messages.not_a_number'))
     end
 
-    it 'no es válido si monto_usd_bruno no es numérico' do
+    it 'no es válido si monto_usd_bruno no es numérico' do  # Cambiado de monto_dolares_bruno
       distribucion = DistribucionUtilidad.new(atributos_validos.merge(monto_usd_bruno: "sesenta y cinco"))
       expect(distribucion).not_to be_valid
       expect(distribucion.errors[:monto_usd_bruno]).to include(I18n.t('activerecord.errors.messages.not_a_number'))

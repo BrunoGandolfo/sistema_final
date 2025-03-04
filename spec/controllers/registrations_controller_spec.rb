@@ -21,18 +21,15 @@ RSpec.describe RegistrationsController, type: :controller do
 
       it 'crea un nuevo usuario con rol colaborador y establece la sesión' do
         expect {
-          post :create, params: valid_params
+          post :create, params: valid_params, format: :json
         }.to change(Usuario, :count).by(1)
         
         expect(response).to have_http_status(:created)
-        
         # Verifica que se estableció la sesión
         expect(session[:user_id]).not_to be_nil
-        
         # Verifica el rol asignado
         user = Usuario.last
         expect(user.rol).to eq('colaborador')
-        
         # Verifica la respuesta JSON
         json_response = JSON.parse(response.body)
         expect(json_response['message']).to eq('Usuario registrado exitosamente')
@@ -52,14 +49,12 @@ RSpec.describe RegistrationsController, type: :controller do
 
       it 'no crea un usuario y muestra errores' do
         expect {
-          post :create, params: invalid_params
+          post :create, params: invalid_params, format: :json
         }.not_to change(Usuario, :count)
         
         expect(response).to have_http_status(:unprocessable_entity)
-        
         # Verifica que no se estableció la sesión
         expect(session[:user_id]).to be_nil
-        
         # Verifica la respuesta JSON
         json_response = JSON.parse(response.body)
         expect(json_response).to have_key('errors')

@@ -1,20 +1,9 @@
 FactoryBot.define do
   factory :usuario do
-    sequence(:nombre) { |n| "Usuario de Prueba #{n}" }
-    sequence(:email) { |n| "usuario#{n}@example.com" }
+    nombre { "Usuario de Prueba" }
+    email { "test#{rand(1000)}@example.com" }
     password { "password" }
-    rol { "admin" }  # Asignamos un valor predeterminado para el rol
-
-    trait :admin do
-      rol { "admin" }
-    end
-
-    trait :socio do
-      rol { "socio" }
-    end
-
-    trait :colaborador do
-      rol { "colaborador" }
-    end
+    password_confirmation { password }  # Usará el mismo valor que password aunque cambie
+    rol { "colaborador" }
   end
 end

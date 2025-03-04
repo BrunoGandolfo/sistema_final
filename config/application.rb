@@ -38,8 +38,7 @@ module SistemaFinal
     end
     
     # Permitir hosts locales en desarrollo
-    config.hosts << "localhost" if Rails.env.development?
-    
+   config.hosts = config.hosts.dup << "localhost" if Rails.env.development?    
     # Configurar Active Job para usar async
     config.active_job.queue_adapter = :async
   end

@@ -1,14 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Conexión Consultora</title>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= stylesheet_link_tag 'application', media: 'all' %>
-   <%= javascript_include_tag 'aplicacion', 'data-turbo-track': 'reload' %>
-  </head>
-  <body>
-    <%= yield %>
-  </body>
-</html>
+<head>
+  <title>Sistema Financiero Conexión Consultora</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+  <style>
+    /* Estilos mínimos para usabilidad básica */
+    body { font-family: sans-serif; margin: 0; padding: 20px; }
+    nav { background: #f0f0f0; padding: 10px; margin-bottom: 20px; }
+    .flash { padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+    .flash.notice { background: #d4edda; }
+    .flash.alert { background: #f8d7da; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+    button, .button {
+      padding: 8px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; }
+    fieldset { margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; }
+    legend { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div id="logo" data-testid="logo">Conexión Consultora</div>
+    <div>
+      <% if current_user %>
+        <span id="user-info" data-testid="user-info">
+          <%= current_user.nombre %> |
+          <%= current_user.rol %>
+        </span>
+        <%= link_to 'Dashboard', dashboard_path, class: 'button', id: 'nav-dashboard', data: { testid: 'nav-dashboard' } %>
+        <%= link_to 'Cerrar Sesión', session_path, data: { turbo_method: :delete }, class: 'button', id: 'nav-logout' %>
+      <% else %>
+        <%= link_to 'Iniciar Sesión', new_user_session_path, class: 'button', id: 'nav-login', data: { testid: 'nav-login' } %>
+        <%= link_to 'Registrarse', signup_path, class: 'button', id: 'nav-signup' %>
+      <% end %>
+    </div>
+  </nav>
 
+  <% flash.each do |type, message| %>
+    <div class="flash <%= type %>" id="flash-<%= type %>" data-testid="flash-<%= type %>">
+      <%= message %>
+    </div>
+  <% end %>
+
+  <%= yield %>
+</body>
+</html>

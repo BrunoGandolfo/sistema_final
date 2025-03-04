@@ -1,19 +1,24 @@
 require 'rails_helper'
 
 RSpec.describe 'Authentication', type: :system do
+  let(:usuario) { create(:usuario, password: "password", password_confirmation: "password") }
+
   before do
-    driven_by(:rack_test)  # Cambia a :chrome_headless si necesitas soporte para JavaScript
+    driven_by(:chrome_headless)
   end
 
-  it 'permite al usuario ver el formulario de Login' do
-    visit login_path
-    expect(page).to have_content("Iniciar Sesión")
-    expect(page).to have_button("Entrar")
-  end
+  describe 'login' do
+    it 'permite al usuario iniciar sesión con credenciales válidas' do
+      visit login_path
+      fill_in "email", with: usuario.email
+      fill_in "password", with: "password"
+      click_button "Entrar"
 
-  it 'permite al usuario ver el formulario de Registro' do
-    visit signup_path
-    expect(page).to have_content("Registrarse")
-    expect(page).to have_button("Crear Cuenta")
+      # Esperar explícitamente a la redirección al dashboard
+      expect(page).to have_current_path(dashboard_path, wait: 10)
+
+      # Verificar que se muestra la información del usuario usando data-testid
+      expect(page).to have_selector("[data-testid='user-info']", text: usuario.nombre, wait: 10)
+    end
   end
 end

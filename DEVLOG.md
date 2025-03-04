@@ -257,3 +257,68 @@ Completar todas las fases de pruebas según el plan original, adaptándonos al e
 - 0 vulnerabilidades críticas o altas detectadas por Brakeman
 - Tiempo de respuesta < 200ms para operaciones estándar bajo carga normal
 - Capacidad para manejar al menos 10x el volumen diario esperado (100 operaciones/día)
+
+
+
+
+
+Informe de la Fase de Pruebas e Integración
+1. Implementación de Pruebas de Request y de Sistema
+
+Pruebas de Request (API):
+
+Se crearon pruebas para los endpoints de operaciones financieras (Ingresos, Gastos, RetiroUtilidades, DistribucionUtilidades) y de autenticación (Login y Registro).
+Se configuraron escenarios positivos y negativos:
+Para ingresos y gastos, se comprobó que se crean registros con datos válidos y se rechazan con datos inválidos.
+Para retiros y distribuciones de utilidades se verificó la autorización: solo los usuarios con permisos (socios o administradores) pueden realizarlos; si se intenta con un usuario no autorizado (por ejemplo, colaborador) se devuelve un error (403) y, en ausencia de autenticación, un error (401).
+Se ajustaron las pruebas para enviar solicitudes en formato JSON mediante as: :json, de modo que las respuestas sean apropiadas (evitando redirecciones de HTML).
+Pruebas de Sistema con Capybara:
+
+Se crearon pruebas end-to-end que simulan el flujo integral del sistema:
+El usuario accede a la página de bienvenida (login).
+Se verifica que el formulario de login funcione correctamente.
+Tras iniciar sesión, el usuario es redirigido (o navega) al tablero, donde se valida la presencia de elementos críticos como el botón "Registrar Ingreso".
+Se solucionaron problemas relacionados con elementos no encontrados y se ajustaron las expectativas para que reflejen el contenido actual del frontend.
+2. Actualización de Controladores y Rutas
+
+ApplicationController:
+
+Se implementó el filtro authenticate_user! para garantizar que solo los usuarios autenticados puedan acceder a operaciones sensibles.
+Se diferenciaron las respuestas para peticiones JSON (devolviendo códigos 401 o 403 con mensajes JSON) y HTML (redirigiendo al login).
+Controladores Específicos:
+
+En controladores como RetiroUtilidadesController y DistribucionUtilidadesController se añadió el filtro require_full_access para restringir el acceso a usuarios con permisos completos.
+Se corrigieron rutas y se agregó la ruta tablero_path para permitir el acceso al tablero.
+Paginas y Rutas:
+
+Se creó un controlador mínimo (PaginasController) con acciones como bienvenida y tablero para que las vistas mínimas funcionen y los tests de sistema puedan navegar sin problemas.
+3. Creación de un Frontend Mínimo
+
+Vistas de Rails:
+
+Layout Principal (app/views/layouts/application.html.erb):
+Se configuró para cargar los archivos CSS y JavaScript necesarios, usando javascript_include_tag en lugar de javascript_pack_tag (compatible con Rails 7).
+Página de Bienvenida (app/views/paginas/bienvenida.html.erb):
+Se creó una vista mínima que incluye un formulario de login con campos para "Correo" y "Contraseña", y un botón "Iniciar sesión".
+Página del Tablero (app/views/paginas/tablero.html.erb):
+Se diseñó una vista básica que muestra el título "Tablero" y un botón "Registrar Ingreso", suficiente para que los tests de sistema verifiquen la navegación y las interacciones esenciales.
+Packs de JavaScript:
+
+Se crearon archivos mínimos en app/javascript/packs/ (por ejemplo, aplicacion.js, bienvenida.js y tablero.js) que actúan como puntos de entrada para cargar funcionalidades básicas, asegurando que el frontend se integre con el backend.
+4. Integración y Ejecución de Pruebas
+
+Se ejecutaron todas las pruebas (unitarias, de request y de sistema) para asegurarnos de que tanto el backend como el frontend mínimo funcionen de forma integrada.
+Los ajustes realizados permitieron superar errores de redirección (por falta de formato JSON) y problemas de rutas o controladores no definidos.
+Se utilizó Capybara para simular la interacción del usuario en el flujo completo: desde el inicio de sesión hasta la navegación al tablero.
+5. Resultado Final
+
+Seguridad y Validaciones:
+Las pruebas confirmaron que el sistema solo permite operaciones a usuarios autenticados y con los permisos adecuados, y que muestra mensajes de error cuando se ingresan datos incorrectos o se intenta acceder sin autorización.
+
+Integración de Frontend y Backend:
+Se comprobó que el flujo integral (login, redirección al tablero, interacción con elementos mínimos) funciona correctamente, asegurando una experiencia básica pero funcional para el usuario.
+
+Confiabilidad del Sistema:
+Al ejecutar la suite completa de pruebas, se validó que los componentes del sistema (modelos, controladores, rutas y vistas) están correctamente integrados y responden según lo esperado.
+
+Este informe resume el trabajo realizado hoy, que abarcó desde la configuración de pruebas detalladas hasta la creación de un frontend mínimo para garantizar la integración total del sistema. Con estos cambios, el sistema está mejor preparado para futuras ampliaciones y para asegurar que la experiencia del usuario final sea coherente y segura.

@@ -1,10 +1,14 @@
 require "rails_helper"
-
 RSpec.describe "Smoke Test", type: :system do
+  before do
+    driven_by(:rack_test)
+    allow_any_instance_of(ApplicationController).to receive(:api_request?).and_return(false)
+  end
+  
   context "cuando el usuario no está autenticado" do
     it "redirige a login desde la raíz" do
       visit root_path
-      expect(page).to have_current_path(new_user_session_path)
+      expect(page).to have_current_path(login_path)
     end
   end
 
@@ -12,14 +16,14 @@ RSpec.describe "Smoke Test", type: :system do
     let!(:usuario) {
       Usuario.create!(nombre: "Test Usuario", email: "socio1@example.com", password: "password", password_confirmation: "password", rol: "socio")
     }
-
+    
     before do
-      visit new_user_session_path
-      fill_in "Email", with: usuario.email
-      fill_in "Contraseña", with: "password"
+      visit login_path
+      fill_in "email", with: usuario.email
+      fill_in "password", with: "password"
       click_button "Entrar"
     end
-
+    
     it "redirige al dashboard desde la raíz" do
       visit root_path
       expect(page).to have_current_path(dashboard_path)
