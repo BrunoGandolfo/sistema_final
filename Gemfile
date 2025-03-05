@@ -62,6 +62,6 @@ group :test do
   gem "webdrivers"
     gem 'rails-controller-testing'
   gem "factory_bot_rails"
-  gem "shoulda-matchers", "~> 5.0"
+  gem "shoulda-matchers", "~> 6.4"
   gem 'diff-lcs', '1.6.0'
  end
