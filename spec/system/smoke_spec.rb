@@ -6,9 +6,11 @@ RSpec.describe "Smoke Test", type: :system do
   end
   
   context "cuando el usuario no está autenticado" do
-    it "redirige a login desde la raíz" do
+    it "muestra la página home desde la raíz" do
       visit root_path
-      expect(page).to have_current_path(login_path)
+      expect(page).to have_current_path(root_path)
+      expect(page).to have_content("Bienvenido al Sistema")
+      expect(page).to have_link("Iniciar Sesión")
     end
   end
 

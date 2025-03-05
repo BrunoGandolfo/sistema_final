@@ -56,11 +56,29 @@
 <div class="operations-grid">
   <h2>Operaciones</h2>
   <div class="operation-buttons">
-    <%= button_tag 'Registrar Ingreso', type: 'button', class: 'button', id: 'new-ingreso-button', data: { toggle: 'modal', target: '#ingreso-modal', testid: 'new-ingreso-button' } %>
-    <%= button_tag 'Registrar Gasto', type: 'button', class: 'button', id: 'new-gasto-button', data: { toggle: 'modal', target: '#gasto-modal', testid: 'new-gasto-button' } %>
+    <%= button_tag 'Registrar Ingreso', 
+                type: 'button', 
+                class: 'button', 
+                id: 'new-ingreso-button', 
+                data: { testid: 'new-ingreso-button' },
+                '@click': '$store.modalIngreso.openModal()' %>
+    <%= button_tag 'Registrar Gasto', 
+                type: 'button', 
+                class: 'button', 
+                id: 'new-gasto-button', 
+                data: { testid: 'new-gasto-button' },
+                '@click': '$store.modalGasto.openModal()' %>
     <% if current_user.rol == "socio" %>
-      <%= button_tag 'Retiro de Utilidades', type: 'button', class: 'button', id: 'new-retiro-button', data: { toggle: 'modal', target: '#retiro-modal', testid: 'new-retiro-button' } %>
-      <%= button_tag 'Distribución de Utilidades', type: 'button', class: 'button', id: 'new-distribucion-button', data: { toggle: 'modal', target: '#distribucion-modal', testid: 'new-distribucion-button' } %>
+      <%= button_tag 'Retiro de Utilidades', 
+                   type: 'button', 
+                   class: 'button modal-button', 
+                   id: 'new-retiro-button', 
+                   data: { target: 'retiro-modal', testid: 'new-retiro-button' } %>
+      <%= button_tag 'Distribución de Utilidades', 
+                   type: 'button', 
+                   class: 'button modal-button', 
+                   id: 'new-distribucion-button', 
+                   data: { target: 'distribucion-modal', testid: 'new-distribucion-button' } %>
     <% else %>
       <button disabled class="button disabled">Retiro de Utilidades</button>
       <button disabled class="button disabled">Distribución de Utilidades</button>
@@ -70,114 +88,239 @@
 
 <!-- El resto del archivo permanece igual -->
 <!-- Modal para Ingreso -->
-<div id="ingreso-modal" class="modal" style="display: none;" data-testid="ingreso-modal">
-  <div class="modal-content">
-    <span class="close" data-testid="ingreso-modal-close">&times;</span>
+<div id="ingreso-modal" 
+     x-data="modalIngreso()" 
+     x-show="$store.modalIngreso.open"
+     x-cloak
+     @keydown.escape.window="closeModal()"
+     class="modal" 
+     style="display: none;" 
+     data-testid="ingreso-modal">
+  <div class="modal-content" @click.outside="closeModal()">
+    <span class="close" data-testid="ingreso-modal-close" @click="closeModal()">&times;</span>
     <h2>Registrar Ingreso</h2>
-    <%= form_with url: ingresos_path, method: :post, id: 'ingreso-form', local: true, data: { testid: 'ingreso-form' } do |f| %>
+    <%= form_with url: ingresos_path, 
+                  method: :post, 
+                  id: 'ingreso-form', 
+                  local: true, 
+                  data: { testid: 'ingreso-form' }, 
+                  html: { '@submit.prevent': 'submitForm($event)' } do |f| %>
       <div class="form-group">
         <%= f.label :fecha, 'Fecha' %>
-        <%= f.date_field :fecha, id: 'ingreso-fecha', value: Date.today, required: true, data: { testid: 'ingreso-fecha' } %>
+        <%= f.date_field :fecha, 
+                        id: 'ingreso-fecha', 
+                        'x-model': 'formData.fecha',
+                        required: true, 
+                        data: { testid: 'ingreso-fecha' } %>
+        <div x-show="errors.fecha" class="error-message text-red-500 text-sm mt-1" x-text="errors.fecha"></div>
       </div>
       <div class="form-group">
         <%= f.label :concepto, 'Concepto' %>
-        <%= f.text_field :concepto, id: 'ingreso-concepto', required: true, data: { testid: 'ingreso-concepto' } %>
+        <%= f.text_field :concepto, 
+                        id: 'ingreso-concepto', 
+                        'x-model': 'formData.concepto',
+                        required: true, 
+                        data: { testid: 'ingreso-concepto' } %>
+        <div x-show="errors.concepto" class="error-message text-red-500 text-sm mt-1" x-text="errors.concepto"></div>
       </div>
       <div class="form-group">
         <%= f.label :monto, 'Monto' %>
-        <%= f.number_field :monto, id: 'ingreso-monto', step: '0.01', required: true, data: { testid: 'ingreso-monto' } %>
+        <%= f.number_field :monto, 
+                          id: 'ingreso-monto', 
+                          'x-model': 'formData.monto',
+                          step: '0.01', 
+                          required: true, 
+                          data: { testid: 'ingreso-monto' } %>
+        <div x-show="errors.monto" class="error-message text-red-500 text-sm mt-1" x-text="errors.monto"></div>
       </div>
       <div class="form-group">
         <%= f.label :moneda, 'Moneda' %>
-        <%= f.select :moneda, ['UYU', 'USD'], {}, { id: 'ingreso-moneda', required: true, data: { testid: 'ingreso-moneda' } } %>
-      </div>       <div class="form-group">
+        <%= f.select :moneda, 
+                    ['UYU', 'USD'], 
+                    {}, 
+                    { id: 'ingreso-moneda', 
+                      'x-model': 'formData.moneda',
+                      required: true, 
+                      data: { testid: 'ingreso-moneda' } } %>
+        <div x-show="errors.moneda" class="error-message text-red-500 text-sm mt-1" x-text="errors.moneda"></div>
+      </div>
+      <div class="form-group">
         <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
         <%= f.collection_select :tipo_cambio_id,
-                                TipoCambio.order(fecha: :desc),
-                                :id,
-                                :valor,
-                                { prompt: "Seleccione tipo de cambio" },
-                                { id: 'ingreso-tipo-cambio', required: true, data: { testid: 'ingreso-tipo-cambio' } } %>
+                              TipoCambio.order(fecha: :desc),
+                              :id,
+                              :valor,
+                              { prompt: "Seleccione tipo de cambio" },
+                              { id: 'ingreso-tipo-cambio', 
+                                'x-model': 'formData.tipo_cambio_id',
+                                required: true, 
+                                data: { testid: 'ingreso-tipo-cambio' } } %>
+        <div x-show="errors.tipo_cambio_id" class="error-message text-red-500 text-sm mt-1" x-text="errors.tipo_cambio_id"></div>
       </div>
       <div class="form-group">
         <%= f.label :area, 'Área' %>
         <%= f.select :area,
-                     ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Otro'],
-                     {},
-                     { id: 'ingreso-area', required: true, data: { testid: 'ingreso-area' } } %>
+                    ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Otro'],
+                    {},
+                    { id: 'ingreso-area', 
+                      'x-model': 'formData.area',
+                      required: true, 
+                      data: { testid: 'ingreso-area' } } %>
+        <div x-show="errors.area" class="error-message text-red-500 text-sm mt-1" x-text="errors.area"></div>
       </div>
       <div class="form-group">
         <%= f.label :cliente_id, 'Cliente' %>
         <%= f.collection_select :cliente_id,
-                                Cliente.all,
-                                :id,
-                                :nombre,
-                                { prompt: "Seleccione cliente" },
-                                { id: 'ingreso-cliente', required: true, data: { testid: 'ingreso-cliente' } } %>
+                              Cliente.all,
+                              :id,
+                              :nombre,
+                              { prompt: "Seleccione cliente" },
+                              { id: 'ingreso-cliente', 
+                                'x-model': 'formData.cliente_id',
+                                required: true, 
+                                data: { testid: 'ingreso-cliente' } } %>
+        <div x-show="errors.cliente_id" class="error-message text-red-500 text-sm mt-1" x-text="errors.cliente_id"></div>
       </div>
       <div class="form-group">
         <%= f.label :sucursal, 'Sucursal' %>
-        <%= f.select :sucursal, ['Montevideo', 'Mercedes'], {}, { id: 'ingreso-sucursal', required: true, data: { testid: 'ingreso-sucursal' } } %>
+        <%= f.select :sucursal, 
+                    ['Montevideo', 'Mercedes'], 
+                    {}, 
+                    { id: 'ingreso-sucursal', 
+                      'x-model': 'formData.sucursal',
+                      required: true, 
+                      data: { testid: 'ingreso-sucursal' } } %>
+        <div x-show="errors.sucursal" class="error-message text-red-500 text-sm mt-1" x-text="errors.sucursal"></div>
       </div>
       <div class="form-group">
-        <%= f.hidden_field :usuario_id, value: current_user.id %>
-        <%= f.submit 'Guardar Ingreso', id: 'ingreso-submit', data: { testid: 'ingreso-submit' } %>
+        <%= f.hidden_field :usuario_id, 'x-model': 'formData.usuario_id', value: current_user.id %>
+        <button type="submit" 
+                id="ingreso-submit" 
+                class="button"
+                data-testid="ingreso-submit"
+                :disabled="isSubmitting">
+          <span x-show="!isSubmitting">Guardar Ingreso</span>
+          <span x-show="isSubmitting">Guardando...</span>
+        </button>
       </div>
     <% end %>
   </div>
 </div>
 <!-- Modal para Gasto -->
-<div id="gasto-modal" class="modal" style="display: none;" data-testid="gasto-modal">
-  <div class="modal-content">
-    <span class="close" data-testid="gasto-modal-close">&times;</span>
+<div id="gasto-modal" 
+     x-data="modalGasto()"
+     x-show="$store.modalGasto.open"
+     x-cloak
+     @keydown.escape.window="closeModal()"
+     class="modal" 
+     style="display: none;" 
+     data-testid="gasto-modal">
+  <div class="modal-content" @click.outside="closeModal()">
+    <span class="close" data-testid="gasto-modal-close" @click="closeModal()">&times;</span>
     <h2>Registrar Gasto</h2>
-    <%= form_with url: gastos_path, method: :post, id: 'gasto-form', local: true, data: { testid: 'gasto-form' } do |f| %>
-      <div class="form-group">      <%= f.label :fecha, 'Fecha' %>
-        <%= f.date_field :fecha, id: 'gasto-fecha', value: Date.today, required: true, data: { testid: 'gasto-fecha' } %>
+    <%= form_with url: gastos_path, 
+                  method: :post, 
+                  id: 'gasto-form', 
+                  local: true, 
+                  data: { testid: 'gasto-form' }, 
+                  html: { '@submit.prevent': 'submitForm($event)' } do |f| %>
+      <div class="form-group">
+        <%= f.label :fecha, 'Fecha' %>
+        <%= f.date_field :fecha, 
+                        id: 'gasto-fecha', 
+                        'x-model': 'formData.fecha',
+                        required: true, 
+                        data: { testid: 'gasto-fecha' } %>
+        <div x-show="errors.fecha" class="error-message text-red-500 text-sm mt-1" x-text="errors.fecha"></div>
       </div>
       <div class="form-group">
         <%= f.label :concepto, 'Concepto' %>
-        <%= f.text_field :concepto, id: 'gasto-concepto', required: true, data: { testid: 'gasto-concepto' } %>
+        <%= f.text_field :concepto, 
+                        id: 'gasto-concepto', 
+                        'x-model': 'formData.concepto',
+                        required: true, 
+                        data: { testid: 'gasto-concepto' } %>
+        <div x-show="errors.concepto" class="error-message text-red-500 text-sm mt-1" x-text="errors.concepto"></div>
       </div>
       <div class="form-group">
         <%= f.label :monto, 'Monto' %>
-        <%= f.number_field :monto, id: 'gasto-monto', step: '0.01', required: true, data: { testid: 'gasto-monto' } %>
+        <%= f.number_field :monto, 
+                          id: 'gasto-monto', 
+                          'x-model': 'formData.monto',
+                          step: '0.01', 
+                          required: true, 
+                          data: { testid: 'gasto-monto' } %>
+        <div x-show="errors.monto" class="error-message text-red-500 text-sm mt-1" x-text="errors.monto"></div>
       </div>
       <div class="form-group">
         <%= f.label :moneda, 'Moneda' %>
-        <%= f.select :moneda, ['UYU', 'USD'], {}, { id: 'gasto-moneda', required: true, data: { testid: 'gasto-moneda' } } %>
+        <%= f.select :moneda, 
+                    ['UYU', 'USD'], 
+                    {}, 
+                    { id: 'gasto-moneda', 
+                      'x-model': 'formData.moneda',
+                      required: true, 
+                      data: { testid: 'gasto-moneda' } } %>
+        <div x-show="errors.moneda" class="error-message text-red-500 text-sm mt-1" x-text="errors.moneda"></div>
       </div>
       <div class="form-group">
         <%= f.label :tipo_cambio_id, 'Tipo de Cambio' %>
         <%= f.collection_select :tipo_cambio_id,
-                                TipoCambio.order(fecha: :desc),
-                                :id,
-                                :valor,
-                                { prompt: "Seleccione tipo de cambio" },
-                                { id: 'gasto-tipo-cambio', required: true, data: { testid: 'gasto-tipo-cambio' } } %>
+                              TipoCambio.order(fecha: :desc),
+                              :id,
+                              :valor,
+                              { prompt: "Seleccione tipo de cambio" },
+                              { id: 'gasto-tipo-cambio', 
+                                'x-model': 'formData.tipo_cambio_id',
+                                required: true, 
+                                data: { testid: 'gasto-tipo-cambio' } } %>
+        <div x-show="errors.tipo_cambio_id" class="error-message text-red-500 text-sm mt-1" x-text="errors.tipo_cambio_id"></div>
       </div>
       <div class="form-group">
         <%= f.label :area, 'Área' %>
         <%= f.select :area,
-                     ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Gastos Generales'],
-                     {},
-                     { id: 'gasto-area', required: true, data: { testid: 'gasto-area' } } %>
+                    ['Jurídica', 'Notarial', 'Contable', 'Recuperación de Activos', 'Gastos Generales'],
+                    {},
+                    { id: 'gasto-area', 
+                      'x-model': 'formData.area',
+                      required: true, 
+                      data: { testid: 'gasto-area' } } %>
+        <div x-show="errors.area" class="error-message text-red-500 text-sm mt-1" x-text="errors.area"></div>
       </div>
       <div class="form-group">
         <%= f.label :proveedor_id, 'Proveedor' %>
         <%= f.collection_select :proveedor_id,
-                                Proveedor.all,
-                                :id,
-                                :nombre,
-                                { prompt: "Seleccione proveedor" },
-                                { id: 'gasto-proveedor', required: true, data: { testid: 'gasto-proveedor' } } %>
-      </div>                <div class="form-group">
-        <%= f.label :sucursal, 'Sucursal' %>
-        <%= f.select :sucursal, ['Montevideo', 'Mercedes'], {}, { id: 'gasto-sucursal', required: true, data: { testid: 'gasto-sucursal' } } %>
+                              Proveedor.all,
+                              :id,
+                              :nombre,
+                              { prompt: "Seleccione proveedor" },
+                              { id: 'gasto-proveedor', 
+                                'x-model': 'formData.proveedor_id',
+                                required: true, 
+                                data: { testid: 'gasto-proveedor' } } %>
+        <div x-show="errors.proveedor_id" class="error-message text-red-500 text-sm mt-1" x-text="errors.proveedor_id"></div>
       </div>
       <div class="form-group">
-        <%= f.hidden_field :usuario_id, value: current_user.id %>
-        <%= f.submit 'Guardar Gasto', id: 'gasto-submit', data: { testid: 'gasto-submit' } %>
+        <%= f.label :sucursal, 'Sucursal' %>
+        <%= f.select :sucursal, 
+                    ['Montevideo', 'Mercedes'], 
+                    {}, 
+                    { id: 'gasto-sucursal', 
+                      'x-model': 'formData.sucursal',
+                      required: true, 
+                      data: { testid: 'gasto-sucursal' } } %>
+        <div x-show="errors.sucursal" class="error-message text-red-500 text-sm mt-1" x-text="errors.sucursal"></div>
+      </div>
+      <div class="form-group">
+        <%= f.hidden_field :usuario_id, 'x-model': 'formData.usuario_id', value: current_user.id %>
+        <button type="submit" 
+                id="gasto-submit" 
+                class="button"
+                data-testid="gasto-submit"
+                :disabled="isSubmitting">
+          <span x-show="!isSubmitting">Guardar Gasto</span>
+          <span x-show="isSubmitting">Guardando...</span>
+        </button>
       </div>
     <% end %>
   </div>
@@ -266,7 +409,8 @@
         <legend>Socio 3 - Gonzalo</legend>
         <div class="form-group">
           <%= f.label :monto_pesos_gonzalo, 'Monto en Pesos (UYU)' %>
-          <%= f.number_field :monto_pesos_gonzalo, id: 'socio3-monto-uyu', step: '0.01', data: { testid: 'monto-pesos-gonzalo' } %>      </div>
+          <%= f.number_field :monto_pesos_gonzalo, id: 'socio3-monto-uyu', step: '0.01', data: { testid: 'monto-pesos-gonzalo' } %>
+        </div>
         <div class="form-group">
           <%= f.label :monto_dolares_gonzalo, 'Monto en Dólares (USD)' %>
           <%= f.number_field :monto_dolares_gonzalo, id: 'socio3-monto-usd', step: '0.01', data: { testid: 'monto-dolares-gonzalo' } %>
@@ -284,84 +428,89 @@
   </div>
 </div>
 <script>
-  // Modal functionality
-  document.querySelectorAll('.button[data-toggle="modal"]').forEach(button => {
-    button.addEventListener('click', function() {
-      const targetId = this.getAttribute('data-target');
-      document.querySelector(targetId).style.display = 'block';
-    });
-  });
-  document.querySelectorAll('.close').forEach(closeBtn => {
-    closeBtn.addEventListener('click', function() {
-      this.closest('.modal').style.display = 'none';
-    });
-  });
-  // Close modal when clicking outside
-  window.addEventListener('click', function(event) {
-    if (event.target.classList.contains('modal')) {
-      event.target.style.display = 'none';
-    }
-  });
-  // Envío de formularios con fetch para evitar recarga
-  // (Simples notificaciones de éxito/fracaso en forma de alert para ejemplo)
-  document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch(this.action, {
-        method: this.method.toUpperCase(),
-        headers: {
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content         },
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message) {
-          alert(data.message);
-          // Cerrar el modal
-          document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        } else if (data.errors) {
-          alert(data.errors.join(', '));
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando scripts para modales tradicionales');
+
+    // Delegated event handler para botones de modal (para retiro y distribución)
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('modal-button') || event.target.closest('.modal-button')) {
+        const button = event.target.classList.contains('modal-button') ? event.target : event.target.closest('.modal-button');
+        const targetModalId = button.dataset.target;
+        
+        // Ignorar botones para modales de ingresos y gastos que usan Alpine.js
+        if (targetModalId !== 'ingreso-modal' && targetModalId !== 'gasto-modal') {
+          console.log('Abriendo modal tradicional:', targetModalId);
+          const modal = document.getElementById(targetModalId);
+          if (modal) {
+            modal.style.display = 'flex';
+          } else {
+            console.error('Modal no encontrado:', targetModalId);
+          }
         }
-      })
-      .catch(error => console.error('Error:', error));
+      }
+    });
+
+    // Evento para cerrar modales al hacer clic en la X (excepto los de ingresos y gastos)
+    document.querySelectorAll('.close').forEach(function(closeButton) {
+      closeButton.addEventListener('click', function() {
+        // No manejar cerrar modales de ingresos y gastos que usan Alpine.js
+        const modal = this.closest('.modal');
+        if (modal && modal.id !== 'ingreso-modal' && modal.id !== 'gasto-modal') {
+          console.log('Cerrando modal tradicional:', modal.id);
+          modal.style.display = 'none';
+        }
+      });
+    });
+
+    // Cerrar modal al hacer clic fuera del contenido (excepto los de ingresos y gastos)
+    window.addEventListener('click', function(event) {
+      if (event.target.classList.contains('modal')) {
+        // No manejar modales de ingresos y gastos que usan Alpine.js
+        if (event.target.id !== 'ingreso-modal' && event.target.id !== 'gasto-modal') {
+          console.log('Cerrando modal tradicional (click fuera):', event.target.id);
+          event.target.style.display = 'none';
+        }
+      }
+    });
+
+    // Manejar envío de formularios sin recargar la página (excepto los de ingresos y gastos)
+    document.addEventListener('submit', function(event) {
+      const form = event.target;
+      // No manejar formularios de ingresos y gastos que usan Alpine.js
+      if (form.id === 'ingreso-form' || form.id === 'gasto-form') {
+        console.log('Ignorando envío de formulario manejado por Alpine:', form.id);
+        return;
+      }
+      
+      // Procesar otros formularios de manera asíncrona
+      if (form.closest('.modal')) {
+        event.preventDefault();
+        console.log('Enviando formulario tradicional:', form.id);
+        
+        fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            console.log('Formulario enviado con éxito:', form.id);
+            alert(data.message || 'Operación completada con éxito');
+            form.closest('.modal').style.display = 'none';
+            location.reload();
+          } else {
+            console.error('Error al enviar formulario:', data.message);
+            alert(data.message || 'Error al procesar la solicitud');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Ocurrió un error al procesar la solicitud');
+        });
+      }
     });
   });
 </script>
-<style>
-  /* Estilos para modal */
-  .modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 20px;
-    width: 70%;
-    max-width: 600px;
-    border-radius: 5px;
-    position: relative;
-  }
-  .close {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .metrics-grid, .operations-grid {
-    margin-bottom: 30px;
-  }   .metric-card {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 15px;
-    background-color: #f9f9f9;
-  }
-</style>

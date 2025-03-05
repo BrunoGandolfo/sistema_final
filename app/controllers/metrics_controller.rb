@@ -1,5 +1,6 @@
 class MetricsController < ApplicationController
-  before_action :require_full_access
+  # Eliminamos el filtro que requiere acceso completo para todos
+  # before_action :require_full_access
   
   def index
     # En el futuro se integrarán los cálculos reales de métricas

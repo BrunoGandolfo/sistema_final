@@ -5,7 +5,7 @@ class PagesController < ApplicationController
     if current_user
       redirect_to dashboard_path
     else
-      # Renderiza la vista de bienvenida con botones de login/registro
+      # Renderizar la vista home en lugar de redireccionar
       render :home
     end
   end
