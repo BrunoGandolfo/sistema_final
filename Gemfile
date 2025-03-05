@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Rails
-gem "rails", "~> 7.2.2", ">= 7.2.2.1"
+gem "rails", "~> 8.0.1"
 
 # Eliminar Sprockets (comentado o borrarlo por completo)
 # gem "sprockets-rails"
