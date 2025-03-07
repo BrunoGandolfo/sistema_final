@@ -1,0 +1,37 @@
+#!/bin/bash
+
+VENDOR_DIR="vendor/webdrivers"
+mkdir -p $VENDOR_DIR
+
+echo "======================= INSTRUCCIONES ======================="
+echo "1. Descargue manualmente ChromeDriver desde:"
+echo "   https://googlechromelabs.github.io/chrome-for-testing/"
+echo "2. Seleccione Chrome 133.x (Stable) - versión Linux"
+echo "3. Descomprima el archivo y copie 'chromedriver' a:"
+echo "   $PWD/$VENDOR_DIR/chromedriver"
+echo "4. Luego ejecute: chmod +x $PWD/$VENDOR_DIR/chromedriver"
+echo "============================================================"
+
+if [ -f "$VENDOR_DIR/chromedriver" ]; then
+  echo "ChromeDriver ya existe. ¿Desea reemplazarlo? (y/n)"
+  read respuesta
+  if [ "$respuesta" != "y" ]; then
+    echo "Operación cancelada."
+    exit 0
+  fi
+fi
+
+echo "Esperando a que coloque el archivo ChromeDriver en la ubicación correcta..."
+echo "Presione Enter cuando haya completado los pasos anteriores."
+read
+
+if [ -f "$VENDOR_DIR/chromedriver" ]; then
+  chmod +x "$VENDOR_DIR/chromedriver"
+  echo "ChromeDriver instalado correctamente."
+  echo "Verificando la versión instalada:"
+  "$VENDOR_DIR/chromedriver" --version
+else
+  echo "ERROR: No se encontró ChromeDriver en $VENDOR_DIR/chromedriver"
+  echo "Por favor, asegúrese de seguir las instrucciones correctamente."
+  exit 1
+fi 

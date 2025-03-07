@@ -1,0 +1,33 @@
+#!/bin/bash
+
+CHROME_DRIVERS=("131.0.0.0" "132.0.0.0" "133.0.0.0")
+VENDOR_DIR="vendor/webdrivers"
+
+mkdir -p $VENDOR_DIR
+
+echo "Descargando versiones de ChromeDriver..."
+
+for version in "${CHROME_DRIVERS[@]}"; do
+  echo "Descargando ChromeDriver $version..."
+  
+  # Intenta desde múltiples fuentes
+  SOURCES=(
+    "https://chromedriver.storage.googleapis.com/$version/chromedriver_linux64.zip"
+    "https://npm.taobao.org/mirrors/chromedriver/$version/chromedriver_linux64.zip"
+    "http://cdn.npm.taobao.org/dist/chromedriver/$version/chromedriver_linux64.zip"
+  )
+  
+  for source in "${SOURCES[@]}"; do
+    if curl -L --max-time 30 --silent --output /tmp/chromedriver.zip "$source"; then
+      echo "Descarga exitosa desde $source"
+      unzip -q -o /tmp/chromedriver.zip -d /tmp
+      mv /tmp/chromedriver "$VENDOR_DIR/chromedriver_$version"
+      chmod +x "$VENDOR_DIR/chromedriver_$version"
+      break
+    else
+      echo "Fallo al descargar desde $source, intentando siguiente fuente..."
+    fi
+  done
+done
+
+echo "Configuración de WebDrivers completada" 

@@ -1,0 +1,187 @@
+# Colores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Variables de configuración
+VENDOR_DIR="vendor/webdrivers"
+CHROME_VERSION="$1"
+
+# Validación de argumentos
+if [ -z "$CHROME_VERSION" ]; then
+    echo -e "${YELLOW}Uso: $0 <version_chrome>${NC}"
+    echo "Ejemplo: $0 133"
+    echo "Versiones disponibles: 133, 134"
+    exit 1
+fi
+
+# Crea directorio si no existe
+mkdir -p "$VENDOR_DIR"
+
+echo -e "${YELLOW}Instalando ChromeDriver para Chrome versión $CHROME_VERSION${NC}"
+
+# Función para probar conectividad
+test_connectivity() {
+    local url="$1"
+    echo -e "${YELLOW}Probando conectividad a $url${NC}"
+    if curl -Is "$url" > /dev/null 2>&1; then
+        echo -e "${GREEN}Conexión exitosa a $url${NC}"
+        return 0
+    else
+        echo -e "${RED}No se puede conectar a $url${NC}"
+        return 1
+    fi
+}
+
+# Función para descargar y configurar ChromeDriver
+download_chromedriver() {
+    local version="$1"
+    local platform="linux64"
+    local target_file="chromedriver_${version}"
+    local target_path="${VENDOR_DIR}/${target_file}"
+
+    # URLs alternativas para diferentes versiones
+    declare -a urls=(
+        "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/133.0.6943.0/linux64/chromedriver-linux64.zip"
+        "https://chromedriver.storage.googleapis.com/133.0.6943.0/chromedriver_linux64.zip"
+        "https://npm.taobao.org/mirrors/chromedriver/133.0.6943.0/chromedriver_linux64.zip"
+    )
+
+    # Probar cada URL
+    local success=false
+    for url in "${urls[@]}"; do
+        echo -e "${YELLOW}Intentando descargar desde: $url${NC}"
+
+        # Verificar conectividad primero
+        if ! test_connectivity "$url"; then
+            echo -e "${RED}No hay conectividad a $url, probando siguiente mirror...${NC}"
+            continue
+        fi
+
+        # Crear directorio temporal
+        local tmp_dir=$(mktemp -d)
+        local zip_file="${tmp_dir}/chromedriver.zip"
+
+        # Intentar descarga con curl con más información
+        echo "Descargando con curl..."
+        if curl -L --verbose --output "$zip_file" "$url" 2>&1; then
+            echo -e "${GREEN}Descarga exitosa${NC}"
+            success=true
+            break
+        else
+            echo -e "${RED}Fallo con curl, intentando wget...${NC}"
+            # Intentar con wget como alternativa
+            if wget --verbose -O "$zip_file" "$url" 2>&1; then
+                echo -e "${GREEN}Descarga exitosa con wget${NC}"
+                success=true
+                break
+            fi
+        fi
+
+        rm -rf "$tmp_dir"
+        echo -e "${RED}Fallo al descargar de este mirror${NC}"
+    done
+
+    if [ "$success" = false ]; then
+        echo -e "${RED}No se pudo descargar ChromeDriver de ningún mirror${NC}"
+        return 1
+    fi
+
+    echo "Descomprimiendo archivo..."
+    unzip -q "$zip_file" -d "$tmp_dir"
+
+    # Encontrar el ejecutable de chromedriver (varía según versión)
+    local driver_exec=$(find "$tmp_dir" -name "chromedriver" -type f)
+
+    if [ -z "$driver_exec" ]; then
+        echo -e "${RED}No se encontró el ejecutable chromedriver en el archivo ZIP${NC}"
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
+    # Copiar a directorio final
+    cp "$driver_exec" "$target_path"
+    chmod +x "$target_path"
+
+    # Limpiar
+    rm -rf "$tmp_dir"
+
+    echo -e "${GREEN}ChromeDriver instalado correctamente en: $target_path${NC}"
+    echo "Verificando la versión instalada:"
+    "$target_path" --version
+
+    return 0
+}
+
+# Alternativa: instalar Firefox WebDriver
+install_firefox_driver() {
+    echo -e "${YELLOW}Instalando GeckoDriver como alternativa...${NC}"
+
+    # Verificar si ya está instalado
+    if command -v geckodriver &> /dev/null; then
+        echo -e "${GREEN}GeckoDriver ya está instalado:${NC}"
+        geckodriver --version
+        return 0
+    fi
+
+    # URLs alternativas para GeckoDriver
+    declare -a gecko_urls=(
+        "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz"
+        "https://npm.taobao.org/mirrors/geckodriver/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz"
+    )
+
+    local success=false
+    for gecko_url in "${gecko_urls[@]}"; do
+        echo -e "${YELLOW}Intentando descargar GeckoDriver desde: $gecko_url${NC}"
+
+        # Verificar conectividad
+        if ! test_connectivity "$gecko_url"; then
+            continue
+        fi
+
+        local tmp_dir=$(mktemp -d)
+
+        if curl -L --verbose --output "${tmp_dir}/geckodriver.tar.gz" "$gecko_url" 2>&1; then
+            success=true
+            break
+        fi
+
+        rm -rf "$tmp_dir"
+    done
+
+    if [ "$success" = false ]; then
+        echo -e "${RED}No se pudo descargar GeckoDriver de ningún mirror${NC}"
+        return 1
+    fi
+
+    echo "Descomprimiendo GeckoDriver..."
+    tar -xzf "${tmp_dir}/geckodriver.tar.gz" -C "$tmp_dir"
+    cp "${tmp_dir}/geckodriver" "$VENDOR_DIR/geckodriver"
+    chmod +x "$VENDOR_DIR/geckodriver"
+
+    rm -rf "$tmp_dir"
+
+    echo -e "${GREEN}GeckoDriver instalado correctamente${NC}"
+    echo "Verificando instalación:"
+    "$VENDOR_DIR/geckodriver" --version
+
+    return 0
+}
+
+# Ejecución principal
+if download_chromedriver "$CHROME_VERSION"; then
+    echo -e "${GREEN}ChromeDriver configurado exitosamente${NC}"
+else
+    echo -e "${RED}No se pudo configurar ChromeDriver${NC}"
+    echo -e "${YELLOW}Instalando driver alternativo...${NC}"
+    install_firefox_driver
+fi
+
+# Instrucciones para uso
+echo ""
+echo -e "${YELLOW}Para usar ChromeDriver con RSpec, ejecute:${NC}"
+echo "bundle exec rspec spec/system"
+echo ""
+echo -e "${YELLOW}Para forzar una versión específica:${NC}"
+echo "CHROME_VERSION=$CHROME_VERSION bundle exec rspec spec/system"
