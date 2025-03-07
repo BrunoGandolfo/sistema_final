@@ -374,8 +374,8 @@ A continuación se describen **los momentos clave** (no se listarán absolutamen
    - Aquí surgen los problemas más complejos de redirecciones (al no distinguir HTML vs JSON de forma efectiva).  
    - En especial: 
      - **InfiniteRedirectError**: ocurriendo al forzar `api_request?` a `true` cuando no se debía, o por configuración en `authenticate_user!`.  
-     - **ElementNotFound**: no se encontraba un `data-testid="ingreso-modal"` porque la vista no mostraba el modal en la ruta “real” o se estaba devolviendo JSON en vez de HTML.  
-     - **Esperas**: `expect(page).to have_content("Dashboard Financiero", wait: 5)` fallando porque la ruta respondía con JSON `"Acceso no autorizado"` en lugar de la vista de Dashboard.
+     - **ElementNotFound**: no se encontraba un `data-testid="ingreso-modal"` porque la vista no mostraba el modal en la ruta "real" o se estaba devolviendo JSON en vez de HTML.  
+     - **Esperas**: `expect(page).to have_content("Dashboard Financiero", wait: 5)` fallando porque la ruta respondía con JSON "Acceso no autorizado" en lugar de la vista de Dashboard.
 
 5. **Ejecución final de **todas las pruebas****  
    - `spec/models/`, `spec/controllers/`, `spec/requests/` y `spec/integration_flow_spec.rb` se encuentran correctas.
@@ -386,7 +386,7 @@ A continuación se describen **los momentos clave** (no se listarán absolutamen
        - No aparece el modal `ingreso-modal`.
        - Redirección infinita con un usuario de tipo "colaborador".
      - `smoke_spec.rb` (1 test fallando): 
-       - Esperaba que `root_path` redirija a `/login`, pero en realidad está redirigiendo a `"/"` o a `"/dashboard"`.
+       - Esperaba que `root_path` redirija a `/login`, pero en realidad está redirigiendo a "/" o a "/dashboard".
    - Se confirma que los ficheros grandes (`aventura_sistema_backup.tar.gz`) provocaban *push rejects* en GitHub por superar los 100 MB. Se eliminaron e ignoraron con `git filter-branch` y `.gitignore`.
 
 ---
@@ -411,7 +411,7 @@ A continuación se describen **los momentos clave** (no se listarán absolutamen
 
 ### 3.3. Redirecciones Infinitas
 - **Problema**: Capybara arrojaba `Capybara::InfiniteRedirectError`: `redirigido más de 5 veces`.
-- **Causa**: Al forzar `api_request? = true` por detectarse “no es HTML”, se devolvía JSON en lugar de HTML, y el front (Capybara) a su vez volvía a recargar la misma ruta generando un loop.  
+- **Causa**: Al forzar `api_request? = true` por detectarse "no es HTML", se devolvía JSON en lugar de HTML, y el front (Capybara) a su vez volvía a recargar la misma ruta generando un loop.  
 - **Solución**: Se refinó la detección en `api_request?`, solo devolviendo `true` cuando:
   ```ruby
   return true if request.format.json?
@@ -419,7 +419,7 @@ A continuación se describen **los momentos clave** (no se listarán absolutamen
   return true if request.xhr?
   # En test environment, se filtran casos más puntuales
   ```
-  Esto reduce la probabilidad de “sobreescribir” la respuesta HTML con JSON.
+  Esto reduce la probabilidad de "sobreescribir" la respuesta HTML con JSON.
 
 ### 3.4. Elementos Capybara/Modal No Encontrados
 - **Problema**: Las pruebas de sistema (`spec/system/ingresos_spec.rb`) esperaban un modal con `data-testid="ingreso-modal"`, pero no existía (o no se veía).
@@ -467,22 +467,22 @@ A continuación se describen **los momentos clave** (no se listarán absolutamen
 ### 5.1. Ajustar las Rutas y la Detección de `api_request?`
 - Actualmente, en `ApplicationController` se devuelven JSON y redirecciones HTML mezclados.  
 - **Propuesta**:
-  1. **Separar** clara y explícitamente las rutas “HTML” (para el uso normal en navegador) de las rutas “JSON” (API).  
+  1. **Separar** clara y explícitamente las rutas "HTML" (para el uso normal en navegador) de las rutas "JSON" (API).  
   2. Ajustar `api_request?` para que no se active en modo test *a menos que la prueba lo requiera* (por ejemplo, en `spec/requests/...`).
   3. Revisar que en las pruebas *system* la cabecera de `Accept` sea `'text/html'`.
 
 ### 5.2. Revisar y Unificar la Pantalla de Dashboard
-- Varios tests de sistema esperan ver `"Dashboard Financiero"`. Revisar la vista `app/views/metrics/index.html.erb` para que contenga un heading `<h1>Dashboard Financiero</h1>` o similar.  
-- Asegurar que el `root_path` del usuario no logueado apunte de verdad a `"/login"` en la prueba de humo si así se necesita.
+- Varios tests de sistema esperan ver "Dashboard Financiero". Revisar la vista `app/views/metrics/index.html.erb` para que contenga un heading `<h1>Dashboard Financiero</h1>` o similar.  
+- Asegurar que el `root_path` del usuario no logueado apunte de verdad a `/login` en la prueba de humo si así se necesita.
 
 ### 5.3. Añadir `data-testid` donde Falte
 - `authentication_spec.rb` busca `[data-testid='user-info']`. En la layout principal `app/views/layouts/application.html.erb` se ve un `<span id="info-usuario" ...>`, pero con `data-testid="info-usuario"`.  
 - Cambiarlo a `data-testid="user-info"` (o adecuar la prueba al `data-testid="info-usuario"` actual).  
-- Igualmente para el modal “Ingresos”: en `metrics/index.html.erb` revisar que sea `data-testid="ingreso-modal"` y su botón `data-testid="new-ingreso-button"`.
+- Igualmente para el modal "Ingresos": en `metrics/index.html.erb` revisar que sea `data-testid="ingreso-modal"` y su botón `data-testid="new-ingreso-button"`.
 
 ### 5.4. Manejo de Roles en Pruebas de Sistema
-- Al parecer “colaborador” intenta crear un ingreso y genera `InfiniteRedirectError` por la verificación de `require_full_access`.  
-- Revisar si la acción de crear ingreso requiere que se sea “socio/admin” o si “colaborador” puede hacerlo sin disparar el `require_full_access`.
+- Al parecer "colaborador" intenta crear un ingreso y genera `InfiniteRedirectError` por la verificación de `require_full_access`.  
+- Revisar si la acción de crear ingreso requiere que se sea "socio/admin" o si "colaborador" puede hacerlo sin disparar el `require_full_access`.
 
 ### 5.5. Listar Archivos Clave a Revisar
 Antes de cualquier refactor de las pruebas que siguen fallando, se sugiere ver los siguientes archivos:
@@ -497,7 +497,7 @@ Antes de cualquier refactor de las pruebas que siguen fallando, se sugiere ver l
    - Para verificar el `data-testid="user-info"` o equivalentes.
 
 4. **`app/views/metrics/index.html.erb`**  
-   - Para verificar si efectivamente se está mostrando “Dashboard Financiero”, los modales `<div id="ingreso-modal"...>`, y sus `data-testid`.
+   - Para verificar si efectivamente se está mostrando "Dashboard Financiero", los modales `<div id="ingreso-modal"...>`, y sus `data-testid`.
 
 5. **`config/routes.rb`**  
    - Para confirmar a dónde apunta el `root "pages#home"` y cómo se define `/login`, `/dashboard`, etc.
@@ -521,3 +521,70 @@ El sistema **ya pasa con éxito** la mayoría de las pruebas: *models*, *control
 Con la **implementación de las recomendaciones** (particularmente un **refactor** para delimitar claramente los endpoints JSON y las vistas HTML), se corregirán los tests de sistema y se eliminarán los loops de redirección.
 
 **¡Lista la bitácora de desarrollo y el estado actual del proyecto!**
+
+## 2024-03-06: Problemas y Mejoras en Configuración de WebDrivers
+
+### Contexto
+Siguiendo las recomendaciones del Dr. Montgomery, implementamos una solución más robusta para la gestión de WebDrivers. Sin embargo, nos encontramos con varios desafíos técnicos.
+
+### Cambios Implementados
+
+1. **Sistema de Gestión de Drivers**
+   - Creación de `TestInfrastructure::DriverManager`
+   - Implementación de detección automática de versiones de Chrome
+   - Sistema de múltiples mirrors para descarga de drivers
+   - Fallback automático a Firefox/GeckoDriver
+
+2. **Script de Instalación Manual**
+   - Nuevo script: `bin/setup_webdriver_for_version`
+   - Soporte para múltiples fuentes de descarga
+   - Manejo mejorado de errores y logging
+   - Verificación de conectividad antes de intentar descargas
+
+3. **Mejoras en Configuración de Capybara**
+   - Integración con el nuevo sistema de gestión de drivers
+   - Mejor manejo de errores y logging
+   - Soporte para entornos WSL/Windows
+
+### Problemas Encontrados
+
+1. **Conectividad**
+   - Dificultades para acceder a los mirrors de ChromeDriver
+   - Problemas similares con los mirrors de GeckoDriver
+   - Posibles restricciones de red corporativas
+
+2. **Compatibilidad de Versiones**
+   - Chrome instalado: 133.0.6943.98
+   - ChromeDriver intentando: 133.0.6943.0
+   - Posibles problemas de matching exacto de versiones
+
+### Próximos Pasos
+
+1. Consultar con el Dr. Montgomery sobre:
+   - Estrategia de caché local de drivers
+   - Mejor manejo de compatibilidad de versiones
+   - Alternativas para problemas de conectividad
+
+2. Considerar:
+   - Implementación de sistema de caché local
+   - Pre-descarga de drivers comunes
+   - Estrategia más flexible para matching de versiones
+
+### Notas Técnicas
+```bash
+# Instalación manual de ChromeDriver
+CHROME_VERSION=133.0.6943.98 bin/setup_webdriver_for_version 133
+
+# Configuración para usar Firefox como fallback
+BROWSER=firefox bundle exec rspec spec/system
+```
+
+### Estado Actual
+- ⚠️ ChromeDriver: No se puede descargar de ningún mirror
+- ⚠️ GeckoDriver: Problemas similares de conectividad
+- 🔄 Sistema de fallback implementado pero no operativo por problemas de red
+
+### Lecciones Aprendidas
+1. Importancia de tener múltiples estrategias de fallback
+2. Necesidad de sistema de caché local
+3. Considerar restricciones de red en la arquitectura inicial
