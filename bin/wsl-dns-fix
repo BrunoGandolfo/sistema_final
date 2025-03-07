@@ -1,0 +1,158 @@
+#!/bin/bash
+# wsl-dns-fix.sh
+# Dr. Richard Montgomery - Solución DNS para WSL
+# ---------------------------------------------
+
+echo "=== Dr. Montgomery's WSL DNS Resolution Fix ==="
+echo ""
+
+# Colores para output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# 1. Diagnóstico inicial
+echo -e "${BLUE}Fase 1: Diagnóstico inicial${NC}"
+echo "Verificando configuración actual de DNS..."
+
+# Comprobar /etc/resolv.conf
+if [ -f /etc/resolv.conf ]; then
+    echo -e "${GREEN}Archivo /etc/resolv.conf encontrado${NC}"
+    echo "Contenido actual:"
+    cat /etc/resolv.conf
+    resolv_exists=true
+else
+    echo -e "${YELLOW}Archivo /etc/resolv.conf no encontrado${NC}"
+    resolv_exists=false
+fi
+
+# Comprobar wsl.conf
+if [ -f /etc/wsl.conf ]; then
+    echo -e "${GREEN}Archivo /etc/wsl.conf encontrado${NC}"
+    echo "Contenido actual:"
+    cat /etc/wsl.conf
+    wsl_conf_exists=true
+else
+    echo -e "${YELLOW}Archivo /etc/wsl.conf no encontrado${NC}"
+    wsl_conf_exists=false
+fi
+
+# Comprobar conectividad DNS actual
+echo ""
+echo "Verificando resolución DNS actual..."
+if ping -c 1 google.com > /dev/null 2>&1; then
+    echo -e "${GREEN}DNS funcionando correctamente${NC}"
+    dns_working=true
+else
+    echo -e "${RED}Problema de resolución DNS detectado${NC}"
+    dns_working=false
+fi
+
+echo ""
+echo -e "${BLUE}Fase 2: Aplicando solución completa${NC}"
+
+# 2. Crear/modificar wsl.conf para control manual de DNS
+echo "Configurando /etc/wsl.conf para control manual de DNS..."
+if $wsl_conf_exists; then
+    # Verificar si ya existe configuración de red
+    if grep -q "\[network\]" /etc/wsl.conf; then
+        sudo sed -i '/\[network\]/,/^\[/ s/generateResolvConf.*/generateResolvConf = false/' /etc/wsl.conf
+        if ! grep -q "generateResolvConf" /etc/wsl.conf; then
+            sudo sed -i '/\[network\]/a generateResolvConf = false' /etc/wsl.conf
+        fi
+    else
+        # Añadir sección network
+        echo -e "\n[network]\ngenerateResolvConf = false" | sudo tee -a /etc/wsl.conf > /dev/null
+    fi
+else
+    # Crear archivo wsl.conf desde cero
+    echo -e "[network]\ngenerateResolvConf = false" | sudo tee /etc/wsl.conf > /dev/null
+fi
+
+echo -e "${GREEN}Archivo /etc/wsl.conf configurado correctamente${NC}"
+echo "Contenido actual:"
+cat /etc/wsl.conf
+
+# 3. Configurar resolv.conf con múltiples servidores DNS (redundancia)
+echo ""
+echo "Configurando /etc/resolv.conf con servidores DNS redundantes..."
+
+# Hacer el archivo editable si existe
+if $resolv_exists; then
+    sudo chattr -i /etc/resolv.conf 2>/dev/null || true
+    sudo rm -f /etc/resolv.conf
+fi
+
+# Crear nuevo resolv.conf con múltiples servidores DNS
+cat << EOF | sudo tee /etc/resolv.conf > /dev/null
+# Configuración DNS optimizada - Dr. Montgomery
+# Servidores DNS primarios (Google + Cloudflare)
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+# Servidor DNS de backup (OpenDNS)
+nameserver 208.67.222.222
+# Servidor local de Windows (si existe)
+nameserver 192.168.1.1
+# Opciones de búsqueda
+search localdomain
+# Configuración avanzada
+options timeout:2 attempts:5 rotate
+EOF
+
+# Proteger el archivo para evitar sobrescritura
+sudo chattr +i /etc/resolv.conf 2>/dev/null || true
+
+echo -e "${GREEN}Archivo /etc/resolv.conf configurado correctamente${NC}"
+echo "Contenido nuevo:"
+cat /etc/resolv.conf
+
+# 4. Verificar nueva configuración
+echo ""
+echo -e "${BLUE}Fase 3: Verificando nueva configuración${NC}"
+echo "Probando resolución DNS con nueva configuración..."
+
+# Esperar unos segundos
+sleep 2
+
+# Probar varios dominios
+domains=("google.com" "github.com" "chromedriver.storage.googleapis.com")
+all_success=true
+
+for domain in "${domains[@]}"; do
+    echo -ne "Verificando $domain... "
+    if ping -c 1 -W 5 $domain > /dev/null 2>&1; then
+        echo -e "${GREEN}OK${NC}"
+    else
+        echo -e "${RED}Fallo${NC}"
+        all_success=false
+    fi
+done
+
+# 5. Consejos adicionales
+echo ""
+echo -e "${BLUE}Fase 4: Recomendaciones adicionales${NC}"
+
+if $all_success; then
+    echo -e "${GREEN}¡Felicidades! La resolución DNS ahora funciona correctamente.${NC}"
+else
+    echo -e "${YELLOW}Algunos dominios siguen sin resolverse. Recomendaciones adicionales:${NC}"
+    echo "1. Reinicie WSL completamente desde PowerShell: wsl --shutdown"
+    echo "2. Verifique la configuración de firewall de Windows"
+    echo "3. Si usa VPN, asegúrese de que permita tráfico DNS o desconéctela temporalmente"
+    echo "4. En casos extremos, añada entradas a /etc/hosts para los dominios problemáticos:"
+    echo "   142.250.200.110 chromedriver.storage.googleapis.com"
+fi
+
+echo ""
+echo "Para verificar la configuración en cualquier momento, ejecute:"
+echo "cat /etc/resolv.conf"
+echo "cat /etc/wsl.conf"
+echo ""
+echo "Para probar la resolución DNS:"
+echo "ping google.com"
+echo "ping github.com"
+
+echo ""
+echo -e "${BLUE}=== Fin del script de reparación DNS ===${NC}"
