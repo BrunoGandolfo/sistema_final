@@ -1,146 +1,80 @@
 <!DOCTYPE html>
-<html x-data>
-<head>
-  <title>Sistema Financiero Conexión Consultora</title>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-  <%= javascript_include_tag "alpine", "data-turbo-track": "reload" %>
-  <%= javascript_include_tag "alpine_components", "data-turbo-track": "reload", defer: true %>
-  <style>
-    /* Estilos mínimos para usabilidad básica inspirados en Tailwind */
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; line-height: 1.5; color: #1a202c; }
-    
-    /* Layout y contenedores */
-    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1rem; }
-    nav { background: #f7fafc; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    
-    /* Notificaciones */
-    .flash { padding: 0.75rem 1rem; margin-bottom: 1rem; border-radius: 0.25rem; }
-    .flash.notice { background: #c6f6d5; color: #276749; }
-    .flash.alert { background: #fed7d7; color: #9b2c2c; }
-    
-    /* Formularios */
-    .form-group { margin-bottom: 1rem; }
-    label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    input, select, textarea { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #4299e1; box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); }
-    
-    /* Botones */
-    button, .button {
-      padding: 0.5rem 1rem;
-      background: #4299e1;
-      color: white;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    button:hover, .button:hover { background: #3182ce; }
-    button:focus, .button:focus { outline: none; box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); }
-    button:disabled, .button.disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    /* Cards y grids */
-    .metrics-grid, .operations-grid { margin-bottom: 2rem; }
-    .metric-card {
-      border: 1px solid #e2e8f0;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      background-color: #f7fafc;
-      border-radius: 0.375rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .metric-card h3 { margin-top: 0; margin-bottom: 0.5rem; color: #2d3748; font-weight: 600; }
-    .metric-card .metric-value { font-size: 1.5rem; font-weight: 700; color: #4299e1; }
-    
-    /* Modales */
-    .modal {
-      position: fixed;
-      z-index: 50;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-content {
-      background-color: white;
-      padding: 1.5rem;
-      width: 90%;
-      max-width: 500px;
-      border-radius: 0.5rem;
-      position: relative;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-    .close {
-      position: absolute;
-      right: 1.25rem;
-      top: 0.75rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      cursor: pointer;
-      color: #a0aec0;
-      transition: color 0.2s;
-    }
-    .close:hover { color: #2d3748; }
-    
-    /* Alpine.js */
-    [x-cloak] { display: none !important; }
-    
-    /* Mensaje de error en formularios */
-    .error-message { color: #e53e3e; font-size: 0.875rem; margin-top: 0.25rem; }
-    
-    /* Responsividad básica */
-    @media (min-width: 640px) {
-      .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-    }
-    @media (min-width: 768px) {
-      .metrics-grid { grid-template-columns: repeat(3, 1fr); }
-      .operation-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    }
-  </style>
-</head>
-<body>
-  <nav>
-    <div class="logo" data-testid="logo">Conexión Consultora</div>
-    
-    <div class="nav-right">
-      <% if current_user %>
-        <div data-testid="user-info" class="user-info">
-          <%= current_user.nombre %> (<%= current_user.rol %>)
-          <%= link_to "Dashboard", dashboard_path, class: "button", data: { testid: "nav-dashboard" } %>
-          <%= link_to "Cerrar sesión", session_path, data: { turbo_method: :delete }, class: "button" %>
-        </div>
-      <% else %>
-        <div class="login-actions">
-          <%= link_to "Iniciar Sesión", login_path, class: "button", data: { testid: "nav-login" } %>
-          <%= link_to "Registrarse", signup_path, class: "button" %>
-        </div>
-      <% end %>
-    </div>
-  </nav>
+<html>
+  <head>
+    <title>Sistema Financiero</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-  <% flash.each do |type, message| %>
-    <div class="flash <%= type %>" data-testid="flash-<%= type %>">
-      <%= message %>
-    </div>
-  <% end %>
+    <%= stylesheet_link_tag "application" %>
+    <%= javascript_importmap_tags %>
+  </head>
 
-  <%= yield %>
-  
-  <script>
-    // Registrar errores en consola para debugging
-    console.log('Layout aplicado correctamente');
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM cargado en layout principal');
-    });
-  </script>
-</body>
+  <body>
+    <nav>
+      <div class="logo" data-testid="logo">Conexión Consultora</div>
+
+      <div class="nav-right" data-testid="nav-container">
+        <%# Contenedor principal siempre presente para pruebas %>
+        <div data-testid="auth-status">
+          <% if current_user %>
+            <%# Estado autenticado %>
+            <div data-testid="user-info" class="user-info">
+              <span data-testid="user-name"><%= current_user.nombre %></span>
+              <span data-testid="user-role">(<%= current_user.rol %>)</span>
+              
+              <%# Mantener los data-testid para los enlaces de navegación %>
+              <div data-testid="nav-actions">
+                <%= link_to "Dashboard", 
+                    dashboard_path, 
+                    class: "button", 
+                    data: { 
+                      testid: "nav-dashboard"
+                    } 
+                %>
+                <%= link_to "Cerrar sesión", 
+                    session_path, 
+                    class: "button", 
+                    data: { 
+                      testid: "nav-logout",
+                      turbo_method: :delete 
+                    } 
+                %>
+              </div>
+            </div>
+          <% else %>
+            <%# Estado no autenticado %>
+            <div class="login-actions" data-testid="login-actions">
+              <%= link_to "Iniciar Sesión", 
+                  new_user_session_path, 
+                  class: "button", 
+                  data: { 
+                    testid: "nav-login"
+                  } 
+              %>
+              <%= link_to "Registrarse", 
+                  signup_path, 
+                  class: "button", 
+                  data: { 
+                    testid: "nav-signup"
+                  } 
+              %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <%# Flash messages %>
+    <% flash.each do |type, message| %>
+      <div class="flash <%= type %>" data-testid="flash-<%= type %>">
+        <%= message %>
+      </div>
+    <% end %>
+
+    <%# Contenido principal %>
+    <main>
+      <%= yield %>
+    </main>
+  </body>
 </html>

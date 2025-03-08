@@ -1,24 +1,22 @@
-<div class="home-container">
-  <h1>Bienvenido al Sistema de Gestión Financiera</h1>
-  <p>Sistema integral para el registro y análisis de operaciones financieras de Conexión Consultora.</p>
+<div class="home-container min-h-screen bg-[#F2F2F2] flex flex-col items-center justify-center relative">
+  <%# Logo y título centrados %>
+  <div class="flex flex-col items-center space-y-6">
+    <%# Logo %>
+    <div class="w-full max-w-md" data-testid="logo-container">
+      <%= image_tag "LOGO.png", 
+          alt: "Conexión Consultora Logo", 
+          class: "w-full h-auto",
+          data: { testid: "main-logo" } %>
+    </div>
 
-  <div class="card">
-    <h2>Características principales</h2>
-    <ul>
-      <li>Dashboard con métricas financieras</li>
-      <li>Registro de ingresos y gastos</li>
-      <li>Gestión de retiros y distribución de utilidades</li>
-      <li>Consultas avanzadas con IA</li>
-      <li>Generación de reportes</li>
-    </ul>
+    <%# Subtítulo %>
+    <h2 class="text-[#0D0D0D] text-xl sm:text-2xl md:text-3xl text-center font-medium tracking-tight" data-testid="subtitle">
+      SISTEMA DE GESTIÓN FINANCIERA INTEGRAL
+    </h2>
   </div>
 
-  <div class="actions">
-    <% if current_user %>
-      <%= link_to 'Ir al Dashboard', dashboard_path, class: 'button', id: 'goto-dashboard', data: { testid: 'goto-dashboard' } %>
-    <% else %>
-      <%= link_to 'Iniciar Sesión', new_user_session_path, class: 'button', id: 'goto-login', data: { testid: 'goto-login' } %>
-      <%= link_to 'Registrarse', signup_path, class: 'button', id: 'goto-signup', data: { testid: 'goto-signup' } %>
-    <% end %>
+  <%# Copyright %>
+  <div class="absolute bottom-4 left-4 text-[#0D0D0D] text-sm" data-testid="copyright">
+    © <%= Time.current.year %> Bruno Gandolfo
   </div>
 </div>

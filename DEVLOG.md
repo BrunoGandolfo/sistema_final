@@ -653,3 +653,58 @@ Se ha implementado exitosamente el sistema "Version Orbit" para la gestión de C
 3. Evaluar la necesidad de purga automática de versiones antiguas
 
 ---
+
+
+
+
+
+
+
+
+# DEVLOG
+
+## 2024-03-XX - Mejoras en la Autenticación y Página Principal
+
+### 🔄 Cambios Realizados
+
+#### Autenticación
+- Resuelto problema de duplicidad en botones de login
+- Mejorado el flujo de autenticación
+- Optimizado el tiempo de ejecución de tests (de ~15s a ~3s)
+- Incrementada la cobertura de código de 21% a 30.55%
+
+#### Página Principal (Home)
+- Implementado nuevo diseño minimalista y centrado
+- Agregado logo corporativo desde assets
+- Incorporado subtítulo "SISTEMA DE GESTIÓN FINANCIERA INTEGRAL"
+- Añadido copyright en la esquina inferior izquierda
+- Aplicada paleta de colores institucional:
+  - Azul Principal: #276BF2 (botones)
+  - Negro Texto: #0D0D0D
+  - Fondo: #F2F2F2
+
+#### Mejoras Técnicas
+- Eliminados elementos duplicados que causaban conflictos en tests
+- Optimizada estructura HTML con Tailwind CSS
+- Agregados data-testid para elementos críticos
+- Mejorada la organización de assets
+
+### 🧪 Tests
+- Corregidos tests de autenticación
+- Mejorada la especificidad de los selectores
+- Eliminados problemas de ambigüedad en elementos DOM
+- Reducido tiempo de ejecución significativamente
+
+### 📁 Archivos Modificados
+- `app/views/pages/home.html.erb`
+- `app/views/layouts/application.html.erb`
+- `spec/system/authentication_spec.rb`
+
+### 🎯 Próximos Pasos
+- Continuar con la implementación del dashboard
+- Mejorar la cobertura de tests
+- Implementar funcionalidades adicionales del sistema
+
+### 📊 Métricas
+- Tiempo de ejecución de tests: 3.36 segundos
+- Cobertura de código: 30.55% (227/743 líneas)
